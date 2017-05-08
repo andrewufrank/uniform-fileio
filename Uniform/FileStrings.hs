@@ -347,10 +347,11 @@ test_call_IO_L = do
 test_call_proc = do
     res <- runErr $ do
         f   <-   callIO $ L.readFile "/proc/1/task/1/maps"  -- not existing fileAccess
+        putIOwords ["test_call_proc", showT . L.length $ f]
         return False   -- expect that read fials
 --    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
--- on ARM 
-  --- on ARM 
+-- on ARM
+  --- on ARM
     assertEqual (Right False) res
 
 test_md5_nonReadable = do
