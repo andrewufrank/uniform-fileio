@@ -159,7 +159,7 @@ instance FileOps FilePath  where
                let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
                let r3 = sort r2  -- sort to make result always the same, independent of copying
                let r4 = map (fn </>) r3
-               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r]
+--               putIOwords ["FileStrigs - getDirCont sorted", showT fn, "files: ", unwordsT . map showT $ r4]
                return r4
           else
                 throwErrorT
