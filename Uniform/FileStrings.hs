@@ -354,6 +354,7 @@ test_md5_nonReadable = do
     res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 ("/proc/1/task/1/maps" ::FilePath)
     putIOwords ["test_md5_nonReadable res", showT res]
     assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
+    -- on ARM assertEqual (Right False) res
 
 corruptJPG = "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG" ::FilePath
 
