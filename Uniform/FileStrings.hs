@@ -52,7 +52,7 @@ import qualified System.FilePath       as OS
 import qualified System.Posix          as P
 -- for fileAccess
 import           Control.Arrow         (second)
-import           Data.List             (isPrefixOf)
+import           Data.List             (isPrefixOf, sort)
 import Control.Exception (catch, SomeException)
 import Control.DeepSeq (($!!), force)
 
@@ -157,9 +157,10 @@ instance FileOps FilePath  where
             do
                r <- callIO . S.listDirectory $ fn
                let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
-               let r3 = map (fn </>) r2
+               let r3 = sort r2  -- sort to make result always the same, independent of copying
+               let r4 = map (fn </>) r3
 --               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r]
-               return r3
+               return r4
           else
                 throwErrorT
                     ["getDirCont not exist or not readable"
