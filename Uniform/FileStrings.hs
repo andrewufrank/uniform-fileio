@@ -346,13 +346,15 @@ test_call_IO_L = do
 
 test_call_proc = do
     res <- runErr $ do
-        f   <-   callIO $ L.readFile "/proc/1/task/1/maps"  -- not existing fileAccess
-        putIOwords ["test_call_proc", showT . L.length $ f]
+        f   <-   callIO $ do 
+			 f1 <- L.readFile "/proc/1/task/1/maps"  -- not existing fileAccess
+		         putIOwords ["test_call_proc", showT . L.length $ f1]
+                         return f1
         return False   -- expect that read fials
---    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
+    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
 -- on ARM
   --- on ARM
-    assertEqual (Right False) res
+--    assertEqual (Right False) res
 
 test_md5_nonReadable = do
     res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 ("/proc/1/task/1/maps" ::FilePath)
