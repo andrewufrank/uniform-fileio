@@ -44,7 +44,7 @@ import qualified Data.ByteString.Lazy  as L
 import           Data.Digest.Pure.MD5  (md5)
 --import Data.Hash.MD5 (md5s)
 import qualified Data.Text.IO          as T
-
+import Data.Either (isLeft)
 import qualified System.Directory      as S
 import qualified System.FilePath       as OS
 --       (addExtension, makeRelative, FilePath, combine, splitPath,
@@ -346,12 +346,14 @@ test_call_IO_L = do
 
 test_call_proc = do
     res <- runErr $ do
-        f   <-   callIO $ do 
+        f   <-   callIO $ do
 			 f1 <- L.readFile "/proc/1/task/1/maps"  -- not existing fileAccess
 		         putIOwords ["test_call_proc", showT . L.length $ f1]
                          return f1
         return False   -- expect that read fials
-    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
+    assertBool (isLeft res)
+    -- ARM and amd64 differe in the exect words - ARM has hGetBufferSome
+--    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
 -- on ARM
   --- on ARM
 --    assertEqual (Right False) res
