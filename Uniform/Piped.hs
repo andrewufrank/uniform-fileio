@@ -65,8 +65,8 @@ getRecursiveContents topPath = do
               then   getRecursiveContents path
               else  do
                     isReadable <- lift $ getFileAccess path (True, False, False)
-                    lift $ putIOwords ["getRecursiveContents isReadable"
-                                    , showT isReadable, showT path]
+--                    lift $ putIOwords ["getRecursiveContents isReadable"
+--                                    , showT isReadable, showT path]
                     if isReadable
                             then yield path
                             else return ()
