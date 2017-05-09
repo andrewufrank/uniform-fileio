@@ -113,6 +113,8 @@ class FileOps fp   where
     getDirCont :: fp ->  ErrIO [fp] --  (Maybe [String])
     -- | get the directory content - if not existing Nothing, if empty Just []
     -- not returning any hidden files
+    -- alphabetic search to assure that equal directories have equal conten
+    -- independent of file system internal structure
     -- filenames completed with calling fp
     getDirContentNonHidden :: fp ->  ErrIO [fp]
 
