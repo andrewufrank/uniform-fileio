@@ -4,8 +4,8 @@ packages:
 - '.'
 #- location: /home/frank/Workspace8/uniform-strings
 #  extra-dep: true
-- location: /home/frank/Workspace8/repo8/uniform/uniform-algebras
-  extra-dep: true
+#- location: /home/frank/Workspace8/repo8/uniform/uniform-algebras
+#  extra-dep: true
 #- location: /home/frank/Workspace8/uniform-error
 #  extra-dep: true
 #- location: /home/frank/Workspace8/repo8/uniform/uniform-time
@@ -17,6 +17,10 @@ packages:
 - location:  
       git: https://github.com/andrewufrank/uniform-error.git
       commit:  46c62fcf8b4d6b7a5a9a3622c724ab573fce295d
+      extra-dep: true 
+- location:  
+      git: https://github.com/andrewufrank/uniform-algebra.git
+      commit:  f218936ca2db8b711092f1a6b08aa081114e811a
       extra-dep: true 
 extra-deps:
 - data-easy-0.7.0

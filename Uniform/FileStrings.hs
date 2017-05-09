@@ -30,6 +30,7 @@ module Uniform.FileStrings (
 --import Uniform.Error
 import           Uniform.FileIOalgebra
 import           Uniform.FilenamesAlgebra
+import           Uniform.Filenames (makeLegalPath)
 import           Uniform.FileStatus
 import           Uniform.Strings hiding ((<.>), (</>))
 
@@ -44,6 +45,7 @@ import qualified Data.ByteString.Lazy  as L
 import           Data.Digest.Pure.MD5  (md5)
 --import Data.Hash.MD5 (md5s)
 import qualified Data.Text.IO          as T
+import Data.Maybe (catMaybes)
 
 import qualified System.Directory      as S
 import qualified System.FilePath       as OS
@@ -243,6 +245,18 @@ instance FileOps LegalPathname  where
           r1 <- getDirCont  . unL $ fn
           let r2 = map mkL r1
           return r2
+
+    getDirContentNonHidden fp = do
+--        putIOwords ["getDirContentNonHidden", unL fp]
+        r <- getDirCont . unL $ fp
+        let r2 = filter (not . isHidden) r
+--        r2 <- callIO $ S.listDirectory (unL fp)
+--          would be possible but filter here is simpler
+--        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
+--        let r2 = filter (not . isPrefixOf "." ) r
+--        putIOwords ["nonhidden files", show r2]
+        let r3 = (map (makeLegalPath . s2t) r2)
+        return (catMaybes r3)
 
     openFile fp mode =  openFile (unL fp) mode
 --    closeFile fp handle = closeFile (unL fp) handle
