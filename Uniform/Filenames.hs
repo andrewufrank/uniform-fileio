@@ -63,7 +63,7 @@ import           Data.Maybe
 import           Test.Framework
 import           Test.Invariant
 
-import           Control.Arrow   (first, second)
+--import           Control.Arrow   (first, second)
 import qualified System.FilePath as OS
 
 type FPtype = Text
@@ -114,7 +114,10 @@ addExtensionOS :: Text -> Text -> Text
 addExtensionOS f e = s2t $ OS.addExtension (t2s f) (t2s e)
 
 splitExtensionOS :: Text -> (Text, Text)
-splitExtensionOS = pair s2t . OS.splitExtension . t2s
+splitExtensionOS = second (removeChar '.') . pair s2t . OS.splitExtension . t2s
+
+test_splitExtensionOS =
+    assertEqual ("a", "b") (splitExtensionOS "a.b")
 
 --joinPathOS :: Text -> Text -> Text
 --joinPathOS f e = s2t . OS.joinPath (t2s f) (t2s e)

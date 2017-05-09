@@ -9,7 +9,7 @@
 
 -- does not work unless i use a phantom first argument
 -----------------------------------------------------------------------------
---{-# OPTIONS_GHC -F -pgmF htfpp #-}
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
 --{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -31,7 +31,8 @@ module Uniform.FilenamesAlgebra (
         --  , module Uniformm.Filenames
          , module Uniform.Error
          , module Uniform.Zero
-            ) where
+          , htf_thisModulesTests
+             ) where
 --
 -- --import qualified Data.Text as T
 -- import qualified System.Posix  as P (FileStatus)
@@ -39,9 +40,9 @@ module Uniform.FilenamesAlgebra (
 --
 ---- using uniform:
 import           Uniform.Error
-import           Uniform.Strings       (s2t, showT, t2s)
+import           Uniform.Strings       (s2t, showT, t2s, removeChar)
 import           Uniform.Zero
-
+import Safe
 import qualified          System.Posix.FilePath as P
     -- for FilePath ~ String
 import  qualified         System.FilePath       as S
@@ -54,7 +55,7 @@ import qualified          Uniform.Filenames  as L
                          , unLegalExtension
                          , combine
             )
---import Test.Framework
+import Test.Framework
 --import Test.Invariant
 --
 
@@ -84,7 +85,11 @@ class Filepathes fp    where
     takeDir = fst3 . splitFilepath
     takeFilename :: fp -> FN fp
     takeExtension :: fp -> Ext fp
+    takeExtension  = thd3 . splitFilepath
     -- take only the last extension (not all)
+    hasExtension :: Text -> fp -> Bool
+    hasExtension e fp = (e==) . extension2text fp . takeExtension $ fp
+
 
     splitFilepath :: fp -> (fp, FN fp, Ext fp)
     combineFilepath :: fp -> FN fp -> Ext fp  -> fp
@@ -95,6 +100,13 @@ class Filepathes fp    where
     -- cannot be inline, because phantom is required
     isHidden :: fp -> Bool
 
+test_hasExtension = do
+    let f :: FilePath = mkFilepath fpX "a/b/c.e"
+    assertBool (hasExtension "e" f)
+test_extension = do
+    let f :: FilePath = mkFilepath fpX "a/b/c.e"
+    let res = extension2text f  . takeExtension $ f
+    assertEqual "e" res
 
 instance Filepathes FilePath where -- is a synonym for String?
     type FN FilePath = FilePath
@@ -110,7 +122,7 @@ instance Filepathes FilePath where -- is a synonym for String?
     splitFilepath fp = (fp1, fn2, ext1 )
             where
                 (fp1,fn1) = S.splitFileName fp   -- inverse combine
-                (fn2, ext1) = S.splitExtension fp
+                (fn2, ext1) = second (removeChar '.') $ S.splitExtension fp
     combineFilepath fp fn e =  addFn fp (addExt fpX fn e)
     addFn = S.combine
     addExt _ = S.addExtension

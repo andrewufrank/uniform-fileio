@@ -25,7 +25,7 @@ module Uniform.FileIO (
          FileOps (..)
          , FileOps2 (..)
          , closeFile2
-         , Filepathes (..)
+         , Filepathes (..), unL
          , lpX, fpX
          , t2fp  -- convert text to filepath, is t2s
          , attachToFileName
