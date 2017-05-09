@@ -40,7 +40,8 @@ module Uniform.Filenames (
           , takeFilenameS, takeExtensionS
           , testExtensionS, replaceExtensionS
           , dirs2path
-          , getFilepathS, getFilenameS
+          , getFilepathS, getFilenameS, splitFilepathS, joinPathS
+          , splitDirectoriesOS -- , splitDirectoriesS
           , Hiddings(..)
           , FPtype
           , FNstrings (..)

@@ -8,6 +8,7 @@
 -- and FilePath
 
 -- does not work unless i use a phantom first argument
+-- change to use only the operations here outside
 -----------------------------------------------------------------------------
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
 --{-# LANGUAGE AllowAmbiguousTypes   #-}
@@ -48,13 +49,13 @@ import qualified          System.Posix.FilePath as P
 import  qualified         System.FilePath       as S
     -- for bytestring
 import qualified          Uniform.Filenames  as L
-                (           LegalPathname, unLegalPathname, makeLegalPath
-                         , LegalExtension, unLegalExtension, makeLegalExtension
-                         , LegalFilename , unLegalFilename, makeLegalFilename
-                         , isHiddenS
-                         , unLegalExtension
-                         , combine
-            )
+--                (           LegalPathname, unLegalPathname, makeLegalPath
+--                         , LegalExtension, unLegalExtension, makeLegalExtension
+--                         , LegalFilename , unLegalFilename, makeLegalFilename
+--                         , isHiddenS, splitFilepathS
+--                         , unLegalExtension
+--                         , combine
+--            )
 import Test.Framework
 --import Test.Invariant
 --
@@ -93,6 +94,8 @@ class Filepathes fp    where
 
     splitFilepath :: fp -> (fp, FN fp, Ext fp)
     combineFilepath :: fp -> FN fp -> Ext fp  -> fp
+
+    splitDirectories :: fp -> [FN fp]
     --
     addFn, (</>) :: fp -> FN fp -> fp
     (</>) = addFn
@@ -124,6 +127,7 @@ instance Filepathes FilePath where -- is a synonym for String?
                 (fp1,fn1) = S.splitFileName fp   -- inverse combine
                 (fn2, ext1) = second (removeChar '.') $ S.splitExtension fp
     combineFilepath fp fn e =  addFn fp (addExt fpX fn e)
+    splitDirectories = map t2s .  L.splitDirectoriesOS . s2t
     addFn = S.combine
     addExt _ = S.addExtension
     isHidden = L.isHiddenS
@@ -145,6 +149,7 @@ instance Filepathes Text where -- is a synonym for String?
             where
                 (fp2, fn2, ext2) = splitFilepath . t2fp . filepath2text ftX $ fpa :: (FilePath, FilePath, FilePath)
     combineFilepath fp fn e =  addFn fp (addExt ftX fn e)
+    splitDirectories =    splitDirectories
     addFn f e = fp2t ((t2fp f) </> (t2fp e))
     addExt _ f e = mkFilename ftX . s2t  $
                         addExt fpX (t2s . filename2text ftX $ f)  (t2s . extension2text ftX $ e)
@@ -177,6 +182,7 @@ instance Filepathes L.LegalPathname where
             where
                 (fp2, fn2, ext2) = splitFilepath . t2fp . filepath2text lpX $ fpa :: (FilePath, FilePath, FilePath)
     combineFilepath fp fn e =  addFn fp (addExt lpX fn e)
+    splitDirectories =  map (mkFilename lpX) . splitDirectories . filepath2text lpX
     addFn = L.combine
     addExt _ f e = mkFilename lpX . s2t  $
                         addExt fpX (t2s . filename2text lpX $ f)  (t2s . extension2text lpX $ e)

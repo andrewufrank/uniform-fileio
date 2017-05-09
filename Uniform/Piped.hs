@@ -50,7 +50,7 @@ import Test.Framework
 getRecursiveContents :: LegalPathname -> Producer LegalPathname  ErrIO ()
 getRecursiveContents topPath = do
 
-  lift $ putIOwords ["getRecursiveContents", showT topPath]
+--  lift $ putIOwords ["getRecursiveContents", showT topPath]
   properNames <- lift $ getDirContentNonHidden topPath
   -- lift into Producer (ie. proxy)
 --  let properNames = filter (`notElem` [".", ".."]) names
