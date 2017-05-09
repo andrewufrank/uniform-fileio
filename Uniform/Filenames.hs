@@ -252,6 +252,9 @@ instance Hiddings LegalFilename where
     mkHiddenS = LegalFilename . ("." <>) . unLegalFilename
     isHiddenS = isPrefixOf' "." . unLegalFilename
 
+instance Hiddings FilePath where
+    mkHiddenS =   ("." ++)
+    isHiddenS = isPrefixOf' "."
 
 instance Hiddings LegalPathname where
     mkHiddenS = LegalPathname . ("." <>) . unLegalPathname
