@@ -261,42 +261,22 @@ instance FileOps LegalPathname  where
     openFile fp mode =  openFile (unL fp) mode
 --    closeFile fp handle = closeFile (unL fp) handle
 
-----        putIOwords ["getDirCont", show f]
---        testDir <- doesDirExist fn
---        readExec <- getFileAccess fn (True, False, True)
---        if testDir && readExec then
---            do
---               r <- callIO . S.listDirectory $ fn
---               let r3 = map (fn </>) r
---               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r]
---               return r3
---          else
---                fail . unwords $
-----                        signalf DirEmpty
---                    ["getDirCont not exist or not readable"
---                    , show fn, show testDir, show readExec]
+    checkSymbolicLink fp =   callIO $ S.pathIsSymbolicLink (unL fp)
+
+    getFileAccess fp (r,w,e) =
+        do
+--            putIOwords ["getFileAccess", show fp]
+            callIO $
+                (do
+
+                    P.fileAccess (unL fp) r w  e
+              `catchError` \e -> do
+                     putIOwords ["getFileAccess error", showT fp, s2t $ show e]
+                     return False )
 
 
 
 
-
-
-
-
-
-
-
-
---instance FileOps2 LegalPathname String where
---
---    readFile2 fp = do
---        e <- callIO . readFile . unL $ fp
-----        callIO $ putStrLn ("readfile2 string" ++ show e)
---        return e
---
---    writeFile2  fp st = callIO $ writeFile (unL fp) st
-
---instance FileOps2 LegalPathname Text where
 
 readFileT :: LegalPathname -> ErrIO Text
 readFileT fp = callIO .  T.readFile . unL $ fp

@@ -28,6 +28,7 @@ import {-@ HTF_TESTS @-} Uniform.FileStrings
 --import {-@ HTF_TESTS @-} FileIO.Text
 --import {-@ HTF_TESTS @-} FileIO.ByteString
 --import {-@ HTF_TESTS @-} TestingFileIO
+import {-@ HTF_TESTS @-} Uniform.Piped
 import Uniform.Strings
 --import Uniform.Error
 

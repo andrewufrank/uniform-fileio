@@ -114,6 +114,7 @@ instance Filepathes FilePath where -- is a synonym for String?
     combineFilepath fp fn e =  addFn fp (addExt fpX fn e)
     addFn = S.combine
     addExt _ = S.addExtension
+    isHidden = L.isHiddenS
 
 instance Filepathes Text where -- is a synonym for String?
     type FN Text = Text

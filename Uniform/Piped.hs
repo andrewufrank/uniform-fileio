@@ -5,7 +5,7 @@
 --
 -- | the recursive access to many files not blocking
 -----------------------------------------------------------------------------
---{-# OPTIONS_GHC -F -pgmF htfpp #-}
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE
     MultiParamTypeClasses
 --    , TypeSynonymInstances
@@ -20,7 +20,7 @@
 
 module  Uniform.Piped (pipedDo, pipedDoIO
             , getRecursiveContents
---    , htf_thisModulesTests
+    , htf_thisModulesTests
 
             ) where
 
@@ -43,7 +43,7 @@ import Uniform.Strings hiding ((<.>), (</>))
 import Uniform.FileStrings
 import Uniform.Filenames
 --
---import Test.Framework
+import Test.Framework
 --import Test.Invariant
 --
 
@@ -80,6 +80,14 @@ pipedDo path transf =  do
     getRecursiveContents path
     >-> P.map (t2s . transf)
     >-> P.stdoutLn
+
+testDir = fromJustNote "testdir" $ makeLegalPath "/home/frank/Workspace8/uniform-fileio/testDirFileIO"
+test_getRec = do
+    res <- runErr $ pipedDo testDir (showT)
+    assertEqual (Right ()) res
+    -- check manually
+
+
 
 
 pipedDoIO :: LegalPathname -> LegalPathname -> (LegalPathname -> ErrIO Text) -> ErrIO ()
