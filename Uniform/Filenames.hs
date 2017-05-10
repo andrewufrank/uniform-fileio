@@ -70,6 +70,32 @@ import qualified System.FilePath as OS
 type FPtype = Text
 -- String -- change to Text requires overloading the OS functions
 
+instance Filepathes L.LegalPathname where
+    type FN L.LegalPathname = L.LegalFilename
+    type Ext L.LegalPathname = L.LegalExtension
+
+    mkFilepath _ a = fromJustNoteT ["mkFilepath", "illegal input", showT a]
+                . L.makeLegalPath $ a
+    mkFilename _ a = fromJustNoteT ["mkFilename", "illegal input", showT a]
+                . L.makeLegalFilename $ a
+    mkExtension _ a = fromJustNoteT ["mkExtension", "illegal input", showT a]
+                . L.makeLegalExtension $ a
+
+    filepath2text _ = L.unLegalPathname
+    filename2text _ = L.unLegalFilename
+    extension2text _ = L.unLegalExtension
+
+    splitFilepath fpa = (mkFilepath lpX . fp2t $ fp2 :: L.LegalPathname
+                            , mkFilename lpX . fp2t $ fn2 :: L.LegalFilename
+                            , mkExtension  lpX . fp2t $ ext2 :: L.LegalExtension)
+            where
+                (fp2, fn2, ext2) = splitFilepath . t2fp . filepath2text lpX $ fpa :: (FilePath, FilePath, FilePath)
+    combineFilepath fp fn e =  addFn fp (addExt lpX fn e)
+    splitDirectories =  map (mkFilename lpX) . splitDirectories . filepath2text lpX
+    addFn = L.combine
+    addExt _ f e = mkFilename lpX . s2t  $
+                        addExt fpX (t2s . filename2text lpX $ f)  (t2s . extension2text lpX $ e)
+    isHidden = L.isHiddenS
 makeLegalExtensionx = error "sdfa"
 unL :: LegalPathname -> FilePath
 unL = t2s . unLegalPathname
