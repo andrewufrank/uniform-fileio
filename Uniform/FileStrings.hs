@@ -3,7 +3,8 @@
 -- Module      :  FileIO.Strings
 --
 -- | the instance for strings (was in 0.1.1)
--- filename are strings
+-- filenames are Path
+-- should only export the instances
 -- removed -- file content can be lazy bytestring
 -----------------------------------------------------------------------------
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
@@ -17,12 +18,12 @@
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 {-# OPTIONS -w #-}
 
-module Uniform.FileStrings (
-            FilePath
-            , closeFile2
+module Uniform.FileStrings (htf_thisModulesTests
+            , module Uniform.Filenames   -- exports Path
             , module Uniform.FileIOalgebra
-    , htf_thisModulesTests
-    , readFileT, writeFileT
+
+
+--    , readFileT, writeFileT
 
             ) where
 
@@ -36,6 +37,11 @@ import           Uniform.Strings hiding ((<.>), (</>))
 
 import           Test.Framework
 import           Test.Invariant
+
+import qualified Path as P
+import qualified Path.IO as P
+
+-- what is further required?
 import qualified System.IO as SIO
 import System.Posix (FileMode)
 
@@ -55,6 +61,7 @@ import qualified System.Posix          as P
 -- for fileAccess
 import           Control.Arrow         (second)
 import           Data.List             (isPrefixOf)
+import Data.Either (isLeft)
 import Control.Exception (catch, SomeException)
 import Control.DeepSeq (($!!), force)
 
@@ -62,54 +69,8 @@ closeFile2 :: Handle -> ErrIO ()
 -- close a handle, does not need a filepath
 closeFile2 handle = callIO $ SIO.hClose handle
 
-instance FileOps FilePath  where
+instance DirOps FilePath where
     doesDirExist = callIO . S.doesDirectoryExist
-    doesFileExist   = callIO . S.doesFileExist
-
-
-    createDir fp = do
-        t <- doesFileOrDirExist fp
-        if not t then  callIO $ S.createDirectory   fp
-            else throwErrorT
-                ["File or Dir exists", showT fp]
-
-
-    createDirIfMissing = callIO . S.createDirectoryIfMissing True
-    copyFile old new = do
-        t <- doesFileExist old
-        t2 <- doesFileExist new
-        if t && (not t2) then do
-            let dir = takeDir new
-            direxist <- doesDirExist   dir
-            unless direxist $ do
-                createDirIfMissing  dir
-            callIO $ S.copyFile (old) ( new)
-
-                else if t then  throwErrorT
-                    ["copyFile source not exist", showT old]
-                    -- signalf   SourceNotExist
-                            else throwErrorT  [
-                            "copyFile target exist", showT new]
-                            --   signalf  TargetExist
-    renameFile old new = do
-        t <- doesFileExist old
-        t2 <- doesFileExist new
-        if t && (not t2)
-            then do
-                let dir = takeDir new
-                direxist <- doesDirExist  dir
-                unless direxist $ do
-                    createDirIfMissing  dir
-                callIO $ S.renameFile ( old) ( new)
-
-            else if not t
-                then  throwErrorT
---                signalf   SourceNotExist
-                            ["renameFile source not exist", showT old]
-                else throwErrorT
---                            signalf  TargetExist
-                                 ["renameFile target exist", showT new]
-
     renameDir old new = do
         putIOwords ["renamed start"]
         testSource <-  doesDirExist old
@@ -126,6 +87,54 @@ instance FileOps FilePath  where
                      return $ unwordsT
                         [ "renamed dir from ", showT old
                             , " to " , showT  new]
+
+instance FileOps FilePath  where
+    doesFileExist   = callIO . S.doesFileExist
+
+
+--    createDir fp = do
+--        t <- doesFileOrDirExist fp
+--        if not t then  callIO $ S.createDirectory   fp
+--            else throwErrorT
+--                ["File or Dir exists", showT fp]
+
+
+--    createDirIfMissing = callIO . S.createDirectoryIfMissing True
+--    copyFile old new = do
+--        t <- doesFileExist old
+--        t2 <- doesFileExist new
+--        if t && (not t2) then do
+--            let dir = takeDir new
+--            direxist <- doesDirExist   dir
+--            unless direxist $ do
+--                createDirIfMissing  dir
+--            callIO $ S.copyFile (old) ( new)
+--
+--                else if t then  throwErrorT
+--                    ["copyFile source not exist", showT old]
+--                    -- signalf   SourceNotExist
+--                            else throwErrorT  [
+--                            "copyFile target exist", showT new]
+--                            --   signalf  TargetExist
+--    renameFile old new = do
+--        t <- doesFileExist old
+--        t2 <- doesFileExist new
+--        if t && (not t2)
+--            then do
+--                let dir = takeDir new
+--                direxist <- doesDirExist  dir
+--                unless direxist $ do
+--                    createDirIfMissing  dir
+--                callIO $ S.renameFile ( old) ( new)
+--
+--            else if not t
+--                then  throwErrorT
+----                signalf   SourceNotExist
+--                            ["renameFile source not exist", showT old]
+--                else throwErrorT
+----                            signalf  TargetExist
+--                                 ["renameFile target exist", showT new]
+
 
     getMD5 fn = do
 --            putIOwords ["getMD5 in FileStrings.hs", showT fn]
@@ -151,32 +160,32 @@ instance FileOps FilePath  where
             putIOwords ["getMD5 in FileStrings.hs", showT fn, showT e]  -- reached
             throwErrorT $ ["getMD5 error for" , showT fn]
 
-    getDirCont fn  = do
---        putIOwords ["getDirCont", show f]
-        testDir <- doesDirExist fn
-        readExec <- getFileAccess fn (True, False, True)
-        if testDir && readExec then
-            do
-               r <- callIO . S.listDirectory $ fn
-               let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
-               let r3 = map (fn </>) r2
---               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r]
-               return r3
-          else
-                throwErrorT
-                    ["getDirCont not exist or not readable"
-                    , showT fn, showT testDir, showT readExec]
+--    getDirCont fn  = do
+----        putIOwords ["getDirCont", show f]
+--        testDir <- doesDirExist fn
+--        readExec <- getFileAccess fn (True, False, True)
+--        if testDir && readExec then
+--            do
+--               r <- callIO . S.listDirectory $ fn
+--               let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
+--               let r3 = map (fn </>) r2
+----               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r]
+--               return r3
+--          else
+--                throwErrorT
+--                    ["getDirCont not exist or not readable"
+--                    , showT fn, showT testDir, showT readExec]
 
-    getDirContentNonHidden fp = do
---        putIOwords ["getDirContentNonHidden", unL fp]
-        r <- getDirCont fp
-        let r2 = filter (not . isHidden) r
---        r2 <- callIO $ S.listDirectory (unL fp)
---          would be possible but filter here is simpler
---        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
---        let r2 = filter (not . isPrefixOf "." ) r
---        putIOwords ["nonhidden files", show r2]
-        return r2
+--    getDirContentNonHidden fp = do
+----        putIOwords ["getDirContentNonHidden", unL fp]
+--        r <- getDirCont fp
+--        let r2 = filter (not . isHidden) r
+----        r2 <- callIO $ S.listDirectory (unL fp)
+----          would be possible but filter here is simpler
+----        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
+----        let r2 = filter (not . isPrefixOf "." ) r
+----        putIOwords ["nonhidden files", show r2]
+--        return r2
 
     deleteFile f = do
          putIOwords ["delete file ", showT f]
@@ -224,39 +233,42 @@ instance FileOps FilePath  where
     openFile fp mode = callIO $ SIO.openFile fp mode
 --    closeFile _ handle = callIO $ SIO.hClose handle
 
-unL = t2s . filepath2text lpX
-mkL = mkFilepath lpX . s2t
+--unL = t2s . filepath2text lpX
+--mkL = mkFilepath lpX . s2t
 
-instance FileOps LegalPathname  where
-    doesDirExist = callIO . S.doesDirectoryExist . unL
-    doesFileExist   = callIO . S.doesFileExist . unL
-
-
-    createDir fp = do
-        t <- doesFileOrDirExist fp
-        if not t then  callIO $ S.createDirectory . unL $ fp
-            else throwErrorT
-                ["File or Dir exists", showT fp]
+instance DirOps (P.Path ar Dir)  where
+    doesDirExist =  P.doesDirExist
+    createDir  = P.createDir
+--        do
+--        t <- doesFileOrDirExist fp
+--        if not t then  callIO $ S.createDirectory . unL $ fp
+--            else throwErrorT
+--                ["File or Dir exists", showT fp]
 
 
-    createDirIfMissing = createDirIfMissing . unL
+    createDirIfMissing = P.createDirIfMissing True
 
-    getDirCont fn  = do
-          r1 <- getDirCont  . unL $ fn
-          let r2 = map mkL r1
-          return r2
+instance FileOps (P.Path ar File)  where
+    doesFileExist   =  doesFileExist
 
-    getDirContentNonHidden fp = do
---        putIOwords ["getDirContentNonHidden", unL fp]
-        r <- getDirCont . unL $ fp
-        let r2 = filter (not . isHidden) r
---        r2 <- callIO $ S.listDirectory (unL fp)
---          would be possible but filter here is simpler
---        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
---        let r2 = filter (not . isPrefixOf "." ) r
---        putIOwords ["nonhidden files", show r2]
-        let r3 = (map (makeLegalPath . s2t) r2)
-        return (catMaybes r3)
+    getMD5 fp = getMD5 (unL fp)
+-- use listDir which separats result in dir and file list and does not include . and ..
+--    getDirCont fn  = do
+--          r1 <- getDirCont  . unL $ fn
+--          let r2 = map mkL r1
+--          return r2
+--
+--    getDirContentNonHidden fp = do
+----        putIOwords ["getDirContentNonHidden", unL fp]
+--        r <- getDirCont . unL $ fp
+--        let r2 = filter (not . isHidden) r
+----        r2 <- callIO $ S.listDirectory (unL fp)
+----          would be possible but filter here is simpler
+----        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
+----        let r2 = filter (not . isPrefixOf "." ) r
+----        putIOwords ["nonhidden files", show r2]
+--        let r3 = (map (makeLegalPath . s2t) r2)
+--        return (catMaybes r3)
 
     openFile fp mode =  openFile (unL fp) mode
 --    closeFile fp handle = closeFile (unL fp) handle
@@ -275,24 +287,24 @@ instance FileOps LegalPathname  where
                      return False )
 
 
+unL = P.toFilePath
 
 
-
-readFileT :: LegalPathname -> ErrIO Text
+readFileT :: Path ar File  -> ErrIO Text
 readFileT fp = callIO .  T.readFile . unL $ fp
 
-writeFileT :: LegalPathname -> Text -> ErrIO ()
+writeFileT :: Path ar File  -> Text -> ErrIO ()
 writeFileT  fp st = callIO $  T.writeFile (unL fp) st
 
+instance   FileOps2 (Path ar File) String where
 
-instance   FileOps2 LegalPathname L.ByteString where
-
-    readFile2 fp = callIO  $  L.readFile  (unL fp)
+    readFile2 fp = callIO $ readFile   (unL fp)
     -- a strict read (does cloes?)
 
-    writeFile2  fp st = callIO  $  L.writeFile  (unL  fp) st
+    writeFile2  fp st = callIO $ writeFile   (unL  fp) st
 
-instance   FileOps2 LegalPathname Text where
+
+instance   FileOps2 (Path ar File) Text where
 
     readFile2 fp = readFile2  (unL fp)
     -- a strict read (does cloes?)
@@ -305,9 +317,66 @@ instance FileOps2 FilePath Text where
 
     writeFile2  fp st = callIO $  T.writeFile fp st
 
---test_catch2 =
---            readFile2 "xxxabc"
---       `catch` \(e::SomeException) -> assertBool True
+instance FileOps2 FilePath L.ByteString where
+
+    readFile2 fp = callIO $  L.readFile fp
+
+    writeFile2  fp st = callIO $  L.writeFile fp st
+
+instance FileOps2 (Path ar File) L.ByteString where
+
+    readFile2 fp = callIO $  L.readFile . unL $ fp
+
+    writeFile2  fp st = callIO $  L.writeFile (unL fp) st
+
+--------------------------test with path
+
+notexisting = makeRelFile "xxxxabcd"
+
+test_catch_error2p = do
+    res <- runErr $ do
+                            f :: Text <-  readFile2 notexisting
+                            return False
+                `catchError `
+                            \(e::Text) ->  return True
+    assertEqual (Right True) res
+
+test_call_IOp = do
+    res <- runErr $ do
+        f :: String <-   readFile2 notexisting  -- not existing fileAccess
+        return False   -- expect that read fials
+    assertEqual ( Left "xxxxabcd: openFile: does not exist (No such file or directory)") res
+
+test_call_IO_Lp = do
+    res <- runErr $ do
+        f :: L.ByteString <-  readFile2 notexisting  -- not existing fileAccess
+        return False   -- expect that read fials
+    assertEqual ( Left "xxxxabcd: openBinaryFile: does not exist (No such file or directory)") res
+
+--test_call_IO_Corrupt= do
+--    res <- runErr $ callIO $ do
+--        f :: L.ByteString <-    L.readFile corruptJPG  -- not existing fileAccess
+--        putIOwords ["call_IO_Corrupt", showT . L.length $ f]  -- just to enforce strictness
+--        return False   -- expect that read fials
+--    assertEqual ( Left "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG: \
+--        \hGetBufSome: hardware fault (Input/output error)") res
+
+procFile = makeAbsFile "/proc/1/task/1/maps"
+test_call_procp = do
+    res <- runErr $ do
+        f :: Text   <-    readFile2  procFile -- not allowed fileAccess
+        return False   -- expect that read fials
+    assertBool (isLeft res)
+--    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
+
+test_md5_nonReadablep = do
+    res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 procFile
+    putIOwords ["test_md5_nonReadable res", showT res]
+    assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
+
+
+------------old test with filepath
+
 
 test_catch_error2 = do
     res <- runErr $ do

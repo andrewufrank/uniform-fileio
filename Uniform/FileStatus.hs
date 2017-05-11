@@ -5,10 +5,10 @@
 --
 -- | the routines to take apart the file status
 -----------------------------------------------------------------------------
+{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE
     MultiParamTypeClasses
     , TypeSynonymInstances
-    , FunctionalDependencies
     , FlexibleInstances
     , FlexibleContexts
 --    , DeriveFunctor
@@ -22,25 +22,28 @@
 
 {-# OPTIONS -w #-}
 
-module Uniform.FileStatus (
+module Uniform.FileStatus ( htf_thisModulesTests
+
 --          FileOps (..)
 --         ,  FileOps2  (..)
 --         , FileOps3 (..)
 --        , FileOpsSignals (..)
 --        , FilePathes (..)
 --        , FilePathes2 (..)
-        getFileStatus, isDirectory, isRegularFile
+        , getFileStatus, isDirectory, isRegularFile
         , getFileStatus'
         , isSymbolicLink
-        , getSymbolicLinkStatusFP
+--        , getSymbolicLinkStatusFP
 --        , createSymbolicLink, renameLink
 --        , doesExist
-    ,getModificationTime  -- TODO is this correct export?
+--    ,getModificationTime  -- TODO is this correct export?
     , getFileSize
 --        , getSymbolicLinkStatusX
                    ) where
 
 --import qualified Data.Text as T
+--import Path
+import Path.IO
 import qualified System.Posix as P
 import qualified System.Directory as S
 ----import Basics
@@ -49,25 +52,27 @@ import Uniform.Zero
 import Uniform.Strings
 import Uniform.Filenames
 
+import Test.Framework
+
 -- new approach
 
-getSymbolicLinkStatusFP :: FilePath  -> ErrIO ( P.FileStatus)
--- ^ get status if exist (else Nothing)
---   is the status of the link, does not follow the link
---
-getSymbolicLinkStatusFP  fp = do
-----    putIOwords ["fileio getSymbolicLinkStatus", fp]
-    st <- callIO $ P.getSymbolicLinkStatus fp
-----    putIOwords ["fileio getSymbolicLinkStatus done", fp]
-    return   st
---  `catchError` (\s -> do
---            putIOwords ["fileio getSymbolicLinkStatus not found", showT fp]
---            return Nothing)
---  where fp = unL lfp
+--getSymbolicLinkStatusFP :: FilePath  -> ErrIO ( P.FileStatus)
+---- ^ get status if exist (else Nothing)
+----   is the status of the link, does not follow the link
+----
+--getSymbolicLinkStatusFP  fp = do
+------    putIOwords ["fileio getSymbolicLinkStatus", fp]
+--    st <- callIO $ P.getSymbolicLinkStatus fp
+------    putIOwords ["fileio getSymbolicLinkStatus done", fp]
+--    return   st
+----  `catchError` (\s -> do
+----            putIOwords ["fileio getSymbolicLinkStatus not found", showT fp]
+----            return Nothing)
+----  where fp = unL lfp
 
 unL = toShortFilePath
 
-getFileStatus :: Path File ra -> ErrIO P.FileStatus
+getFileStatus :: Path df ra -> ErrIO P.FileStatus
 getFileStatus fp = callIO $ P.getFileStatus . unL $ fp
 
 getFileStatus' :: FilePath  -> ErrIO P.FileStatus
@@ -75,10 +80,10 @@ getFileStatus' fp = callIO $ P.getFileStatus   fp
 
 
 isRegularFile :: P.FileStatus -> Bool
-isDirectory :: P.FileStatus -> Bool
-isSymbolicLink :: P.FileStatus -> Bool
-isDirectory = P.isDirectory
 isRegularFile = P.isRegularFile
+isDirectory :: P.FileStatus -> Bool
+isDirectory = P.isDirectory
+isSymbolicLink :: P.FileStatus -> Bool
 isSymbolicLink = P.isSymbolicLink
 getModificationTime = P.modificationTime
 getFileSize = P.fileSize
@@ -93,18 +98,16 @@ renameLink :: Path df ra  -> Path df ra  -> ErrIO ()
 renameLink old new = callIO $ P.rename (unL old) (unL new)
 -- should check that this is a link and existing etc.
 
-doesExist :: Path df ra  -> ErrIO Bool
--- ^ test if dir, file or link exist
-doesExist lfp = liftIO $ do
+--doesExist :: Path df ra  -> ErrIO Bool
+---- ^ test if dir, file or link exist
+--doesExist lfp = callIO $ do
+--
+--    f <- doesFileExist lfp
+--    d <- doesDirectoryExist lfp
+--    s <- pathIsSymbolicLink lfp
+--    return (f || d || s)
+--  where fp = unL lfp
 
-    f <- S.doesFileExist fp
-    d <- S.doesDirectoryExist fp
-    s <- S.pathIsSymbolicLink fp
-    return (f || d || s)
-  where fp = unL lfp
-
-instance CharChains2 FilePath Text where
-    show' = s2t
 
 ----from fay
 ---- | Join for Maybe.

@@ -1,16 +1,12 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  SVN.FileIO
+-- Module      :  FileIO
 -- Copyright   :  andrew u frank -
 --
 -- | the basic file io - translated for the Either or ErrorT signaling style
 --  there are better (higher performance methods - replace while retaining conditions
 
--- reduced oct 2016 to small set
--- separate the operations from the OS and the operations which check for
--- undesirable characters in the filename and extension
--- approach: addExtension checks for bad extension characters
--- no checks for the filename?
+-- uses the Path and Path.IO framework
 -----------------------------------------------------------------------------
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE FlexibleContexts      #-}
@@ -25,6 +21,7 @@ module Uniform.FileIO (
         module Uniform.Filenames
          , module Uniform.Error
          , module Uniform.Strings
+         , module Uniform.FileStatus
 --         FileOps (..)
 --         , FileOps2 (..)
 --         , closeFile2
@@ -73,7 +70,7 @@ import qualified System.Posix          as P (FileStatus)
 import           Uniform.Error
 --import           Uniform.FileIOalgebra
 import           Uniform.Filenames
---import           Uniform.FileStatus
+import           Uniform.FileStatus
 --import           Uniform.FileStrings
 --import           Uniform.Piped
 import           Uniform.Strings hiding ((</>))
@@ -83,6 +80,11 @@ import           Uniform.Zero
 
 import           Test.Framework
 import           Test.Invariant
+
+
+instance CharChains2 FilePath Text where
+    show' = s2t
+
 
 --import           Control.Arrow         (first, second)
 --import qualified System.FilePath       as OS

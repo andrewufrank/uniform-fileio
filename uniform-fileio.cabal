@@ -32,6 +32,7 @@ library
             pipes ,
             safe,
             path,
+            path-io,
 -- for tests
             HTF, test-invariant
 --            QuickCheck,
@@ -48,12 +49,12 @@ library
              Uniform.Filenames
              Uniform.FileIO
              -- exposed only for test use
---             Uniform.FileStrings
+             Uniform.FileStrings
 
 --             Uniform.Piped
---             Uniform.FileIOalgebra
+             Uniform.FileIOalgebra
 --             Uniform.FileStrings
---             Uniform.FileStatus
+             Uniform.FileStatus
 --             Uniform.TypedFile
 --             Uniform.FileText
     exposed: True

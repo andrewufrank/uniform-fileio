@@ -25,7 +25,7 @@
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.FileIOalgebra (
-         FileOps (..)
+         FileOps (..), DirOps (..)
          , FileOps2 (..)
         , Handle , IOMode (..)
 
@@ -49,8 +49,9 @@ module Uniform.FileIOalgebra (
 
             ) where
 
+
 --import qualified Data.Text as T
-import qualified System.Posix  as P (FileStatus)
+import qualified System.Posix  as Posix (FileStatus)
 --import qualified System.Directory as S
 
 ---- using uniform:
@@ -75,29 +76,31 @@ import System.IO (Handle, IOMode (..) )
 ---- the doesXX do not produce any exceptiosn
 -- is polymorph either in LegalFilename or in RawFilePath (i.e. bytestring )
 
-class FileOps fp   where
+class DirOps fp where
     doesDirExist :: fp -> ErrIO Bool
-    doesFileExist :: fp -> ErrIO Bool
-    doesFileOrDirExist :: fp -> ErrIO Bool
-    doesFileOrDirExist fp = do
-        d <- doesDirExist fp
-        f <- doesFileExist fp
-        return   (d || f)
-
     createDir :: fp -> ErrIO ()
     -- | write in a dir a new file with content
 
     createDirIfMissing :: fp ->  ErrIO ()
-    -- | creates the directory, if missing
+    -- | creates the directory, if missing, recursive for path
     -- noop if dir exist
+    renameDir :: fp -> fp ->  ErrIO Text
+    -- ^ rename directory old to new
+    -- signals: getFileStatus: does not exist (No such file or directory)
+
+class FileOps fp   where
+    doesFileExist :: fp -> ErrIO Bool
+--    doesFileOrDirExist :: fp -> ErrIO Bool
+--    doesFileOrDirExist fp = do
+--        d <- doesDirExist fp
+--        f <- doesFileExist fp
+--        return   (d || f)
+
 
     copyFile :: fp -> fp ->  ErrIO ()
     -- ^ copy a file from old to new
     renameFile :: fp -> fp ->  ErrIO ()
     -- ^ rename a file from old to new
-    renameDir :: fp -> fp ->  ErrIO Text
-    -- ^ rename directory old to new
-    -- signals: getFileStatus: does not exist (No such file or directory)
 
     deleteFile :: fp -> ErrIO ()
     deleteDirRecursive :: fp -> ErrIO ()
@@ -124,7 +127,7 @@ class FileOps fp   where
     getAppConfigDirectory :: ErrIO fp
     -- ^ find the .config directory path
 
-    getSymbolicLinkStatus :: fp ->   ErrIO ( P.FileStatus)
+    getSymbolicLinkStatus :: fp ->   ErrIO ( Posix.FileStatus)
     -- ^ get status if exist (else Nothing)
     --   is the status of the link, does not follow the link
 
@@ -155,7 +158,7 @@ class FileOps fp   where
 --
 ---- | the operations on files with content
 --
-class (FileOps fp, Filepathes fp, Show fp) =>
+class (FileOps fp, Show fp) =>
     FileOps2 fp fc where
 --
     writeFile2 :: fp -> fc -> ErrIO ()
@@ -174,19 +177,19 @@ class (FileOps fp, Filepathes fp, Show fp) =>
 --    writeFileCreateDir :: fp -> fp -> fc ->  ErrIO ()
 --    -- | create file in existing dir
 --
-    writeFileOrCreate :: fp -> fc -> ErrIO ()
-   -- | write or create a file
-   -- if create dir if not exist (recursively for path)
-    writeFileOrCreate filepath st = do
-        let (dir, fn, ext) = splitFilepath filepath
-        --        writeFileCreateDir dir fn st
-        --                  writeFileCreateDir dirpath filename st = do
---        let fp = dirpath `combine` filename
-        d <- doesDirExist dir
-        --        f <- doesFileExist fp --
-        unless d $
-                createDirIfMissing dir
-        writeFile2 filepath st
+--    writeFileOrCreate :: fp -> fc -> ErrIO ()
+--   -- | write or create a file
+--   -- if create dir if not exist (recursively for path)
+--    writeFileOrCreate filepath st = do
+--        let (dir, fn, ext) = splitFilepath filepath
+--        --        writeFileCreateDir dir fn st
+--        --                  writeFileCreateDir dirpath filename st = do
+----        let fp = dirpath `combine` filename
+--        d <- doesDirExist dir
+--        --        f <- doesFileExist fp --
+--        unless d $
+--                createDirIfMissing dir
+--        writeFile2 filepath st
 
 --
 
