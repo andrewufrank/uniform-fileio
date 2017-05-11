@@ -65,7 +65,9 @@ getSymbolicLinkStatusFP  fp = do
 --            return Nothing)
 --  where fp = unL lfp
 
-getFileStatus :: LegalPathname -> ErrIO P.FileStatus
+unL = toShortFilePath
+
+getFileStatus :: Path File ra -> ErrIO P.FileStatus
 getFileStatus fp = callIO $ P.getFileStatus . unL $ fp
 
 getFileStatus' :: FilePath  -> ErrIO P.FileStatus
@@ -81,17 +83,17 @@ isSymbolicLink = P.isSymbolicLink
 getModificationTime = P.modificationTime
 getFileSize = P.fileSize
 
-createSymbolicLink :: LegalPathname -> LegalPathname -> ErrIO ()
+createSymbolicLink :: Path df ra -> Path df ra-> ErrIO ()
 createSymbolicLink fn tn = do
     putIOwords ["createSymbolidLink", showT fn , "to", showT tn]
     callIO $ P.createSymbolicLink (unL fn) (unL tn)
 
 
-renameLink :: LegalPathname -> LegalPathname -> ErrIO ()
+renameLink :: Path df ra  -> Path df ra  -> ErrIO ()
 renameLink old new = callIO $ P.rename (unL old) (unL new)
 -- should check that this is a link and existing etc.
 
-doesExist :: LegalPathname -> ErrIO Bool
+doesExist :: Path df ra  -> ErrIO Bool
 -- ^ test if dir, file or link exist
 doesExist lfp = liftIO $ do
 

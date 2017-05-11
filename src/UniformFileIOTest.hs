@@ -23,15 +23,15 @@ module Main     where      -- must have Main (main) or Main where
 --import System.Exit
 
 import Test.Framework
-import {-@ HTF_TESTS @-} Uniform.FileIO
-import {-@ HTF_TESTS @-} Uniform.FileStrings
+--import {-@ HTF_TESTS @-} Uniform.FileIO
+--import {-@ HTF_TESTS @-} Uniform.FileStrings
 --import {-@ HTF_TESTS @-} FileIO.Text
 --import {-@ HTF_TESTS @-} FileIO.ByteString
 --import {-@ HTF_TESTS @-} TestingFileIO
-import {-@ HTF_TESTS @-} Uniform.Piped
-import {-@ HTF_TESTS @-} Uniform.FilenamesAlgebra
+--import {-@ HTF_TESTS @-} Uniform.Piped
+import {-@ HTF_TESTS @-} Uniform.Filenames
+
 import Uniform.Strings
---import Uniform.Error
 
 --import TestingFileIO
 
@@ -45,16 +45,6 @@ main = do
     htfMain   htf_importedTests
     putIOwords ["HTF end LayoutTest.hs:\n posTest"]
     runTest test_fileio
-
---    r <- runErr fileioTest2
---    v1 ::[Bool] <- case r of
---        Left msg -> do
---                putIOwords ["fileioTest returned Left :", msg]
---                return [False]
---        Right v -> return v
---
---    let res =  v1
---    putIOwords ["result", unwords . map show' $ res]
     return ()
 
 

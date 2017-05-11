@@ -31,6 +31,7 @@ library
             unix -any,
             pipes ,
             safe,
+            path,
 -- for tests
             HTF, test-invariant
 --            QuickCheck,
@@ -44,23 +45,23 @@ library
     exposed-modules:
 --             FileIO.ByteString
 --             Uniform.Filenames
-             Uniform.FilenamesAlgebra
+             Uniform.Filenames
              Uniform.FileIO
              -- exposed only for test use
-             Uniform.FileStrings
-
-             Uniform.Piped
-             Uniform.FileIOalgebra
 --             Uniform.FileStrings
-             Uniform.FileStatus
-             Uniform.TypedFile
+
+--             Uniform.Piped
+--             Uniform.FileIOalgebra
+--             Uniform.FileStrings
+--             Uniform.FileStatus
+--             Uniform.TypedFile
 --             Uniform.FileText
     exposed: True
     buildable: True
     default-language: Haskell2010
     hs-source-dirs: .
     other-modules:
-             Uniform.Filenames
+--             Uniform.Filenames
 --             Uniform.FileIOalgebra
 --             Uniform.Piped
 --             Uniform.FileStatus

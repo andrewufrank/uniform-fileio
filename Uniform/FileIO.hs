@@ -22,42 +22,44 @@
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.FileIO (
-         FileOps (..)
-         , FileOps2 (..)
-         , closeFile2
-         , Filepathes (..), unL
-         , lpX, fpX
-         , t2fp  -- convert text to filepath, is t2s
-         , attachToFileName
---         , CV2legal (..)
---         , CV2paths (..)
---        --  , (</>), (<.>)
---         , FNstrings (..)
---         , Hiddings(..)
-----         , getFilepathS, dirs2path, makeLegalPath
---        --  , module Uniform.Filenames  -- export only these functions
-        , LegalPathname (..)
---        , unLegalPathname, unL, makeLegalPath
-        , LegalFilename
---            (..), unLegalFilename, makeLegalFilename
-        , LegalExtension
-            --(..), makeLegalExtension
---        , attachToFileName
---        , getFilenameS
---        , FPtype   -- should not be used
---        -- , FPtype
---         , module Uniform.FileStatus
---         , P.FileStatus
-         , module Uniform.FileStrings
+        module Uniform.Filenames
          , module Uniform.Error
-         , module Uniform.TypedFile
+         , module Uniform.Strings
+--         FileOps (..)
+--         , FileOps2 (..)
+--         , closeFile2
+--         , Filepathes (..), unL
+--         , lpX, fpX
+--         , t2fp  -- convert text to filepath, is t2s
+--         , attachToFileName
+----         , CV2legal (..)
+----         , CV2paths (..)
+----        --  , (</>), (<.>)
+----         , FNstrings (..)
+----         , Hiddings(..)
+------         , getFilepathS, dirs2path, makeLegalPath
+----        --  , module Uniform.Filenames  -- export only these functions
+--        , LegalPathname (..)
+----        , unLegalPathname, unL, makeLegalPath
+--        , LegalFilename
+----            (..), unLegalFilename, makeLegalFilename
+--        , LegalExtension
+--            --(..), makeLegalExtension
+----        , attachToFileName
+----        , getFilenameS
+----        , FPtype   -- should not be used
+----        -- , FPtype
+----         , module Uniform.FileStatus
+----         , P.FileStatus
+--         , module Uniform.FileStrings
+--         , module Uniform.TypedFile
 
 --         , getModificationTime
 --         , P.FileStatus
-         , pipedDo, pipedDoIO
-         , getRecursiveContents
+--         , pipedDo, pipedDoIO
+--         , getRecursiveContents
          , htf_thisModulesTests
-         ,legalpathnameConstructor
+--         ,legalpathnameConstructor
                 -- LegalPathname is not available as a constructor
 
             ) where
@@ -69,25 +71,25 @@ import qualified System.Posix          as P (FileStatus)
 
 -- using uniform:
 import           Uniform.Error
-import           Uniform.FileIOalgebra
-import           Uniform.FilenamesAlgebra
-import Uniform.Filenames -- must import the constructors for the test strategy to work
-import           Uniform.FileStatus
-import           Uniform.FileStrings
-import           Uniform.Piped
-import           Uniform.Strings
-import           Uniform.TypedFile
+--import           Uniform.FileIOalgebra
+import           Uniform.Filenames
+--import           Uniform.FileStatus
+--import           Uniform.FileStrings
+--import           Uniform.Piped
+import           Uniform.Strings hiding ((</>))
+--import           Uniform.TypedFile
+
 import           Uniform.Zero
 
 import           Test.Framework
 import           Test.Invariant
 
-import           Control.Arrow         (first, second)
-import qualified System.FilePath       as OS
+--import           Control.Arrow         (first, second)
+--import qualified System.FilePath       as OS
 
 ---- | operations on files and directories
 ---- the doesXX do not produce any exceptiosn
 -- is polymorph either in LegalFilename or in RawFilePath (i.e. bytestring )
 
-legalpathnameConstructor  :: Text -> LegalPathname
-legalpathnameConstructor = LegalPathname
+--legalpathnameConstructor  :: Text -> LegalPathname
+--legalpathnameConstructor = LegalPathname

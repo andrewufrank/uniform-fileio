@@ -29,8 +29,8 @@ module Uniform.FileStrings (
 -- using uniform
 --import Uniform.Error
 import           Uniform.FileIOalgebra
-import           Uniform.FilenamesAlgebra
-import           Uniform.Filenames (makeLegalPath)
+--import           Uniform.FilenamesAlgebra
+import           Uniform.Filenames -- (makeLegalPath)
 import           Uniform.FileStatus
 import           Uniform.Strings hiding ((<.>), (</>))
 

@@ -56,7 +56,7 @@ import qualified System.Posix  as P (FileStatus)
 ---- using uniform:
 import           Uniform.Error
 import           Uniform.Zero
-import           Uniform.FilenamesAlgebra
+--import           Uniform.FilenamesAlgebra
 import System.IO (Handle, IOMode (..) )
 --import System.Posix (FileMode)
 

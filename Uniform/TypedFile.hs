@@ -17,7 +17,7 @@ module Uniform.TypedFile (
 
 import           Uniform.Error
 import           Uniform.FileIOalgebra
-import           Uniform.FilenamesAlgebra
+import           Uniform.Filenames
 import           Uniform.FileStrings
 
 import           Uniform.Strings
