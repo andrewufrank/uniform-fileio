@@ -25,7 +25,7 @@
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.FileIOalgebra (
-         FileOps (..), DirOps (..)
+         FileOps (..), DirOps (..), FileSystemOps (..)
          , FileOps2 (..)
         , Handle , IOMode (..)
 
@@ -52,7 +52,7 @@ module Uniform.FileIOalgebra (
 
 --import qualified Data.Text as T
 import qualified System.Posix  as Posix (FileStatus)
---import qualified System.Directory as S
+import qualified System.Directory as D
 
 ---- using uniform:
 import           Uniform.Error
@@ -76,30 +76,40 @@ import System.IO (Handle, IOMode (..) )
 ---- the doesXX do not produce any exceptiosn
 -- is polymorph either in LegalFilename or in RawFilePath (i.e. bytestring )
 
-class DirOps fp where
-    doesDirExist :: fp -> ErrIO Bool
-    createDir :: fp -> ErrIO ()
-    -- | write in a dir a new file with content
+--class ListDir d f where
+--    listDir' :: d -> ErrIO ([d],[f])
+class FileSystemOps fp where
+    getPermissions' :: fp -> ErrIO D.Permissions
+    checkSymbolicLink :: fp -> ErrIO Bool
+    -- ^ check if the fp points to a symbolic link
+    -- better use isSimbolicLink (from FileStatus)
 
-    createDirIfMissing :: fp ->  ErrIO ()
+class DirOps fp where
+    doesDirExist' :: fp -> ErrIO Bool
+    createDir' :: fp -> ErrIO ()
+    -- | write in a dir a new file with content
+--    getDirPermissions  :: fp -> ErrIO D.Permissions
+
+    createDirIfMissing' :: fp ->  ErrIO ()
     -- | creates the directory, if missing, recursive for path
     -- noop if dir exist
-    renameDir :: fp -> fp ->  ErrIO Text
+    renameDir' :: fp -> fp ->  ErrIO Text
     -- ^ rename directory old to new
     -- signals: getFileStatus: does not exist (No such file or directory)
 
 class FileOps fp   where
-    doesFileExist :: fp -> ErrIO Bool
+    doesFileExist' :: fp -> ErrIO Bool
 --    doesFileOrDirExist :: fp -> ErrIO Bool
 --    doesFileOrDirExist fp = do
 --        d <- doesDirExist fp
 --        f <- doesFileExist fp
 --        return   (d || f)
 
+--    getPermissions' :: fp -> ErrIO D.Permissions
 
-    copyFile :: fp -> fp ->  ErrIO ()
+    copyFile' :: fp -> fp ->  ErrIO ()
     -- ^ copy a file from old to new
-    renameFile :: fp -> fp ->  ErrIO ()
+    renameFile' :: fp -> fp ->  ErrIO ()
     -- ^ rename a file from old to new
 
     deleteFile :: fp -> ErrIO ()
@@ -135,14 +145,11 @@ class FileOps fp   where
     -- ^ check the read, write and execute permission on file
     -- dir get content needs execute,
 
-    checkSymbolicLink :: fp -> ErrIO Bool
-    -- ^ check if the fp points to a symbolic link
-    -- better use isSimbolicLink (from FileStatus)
 
 
 -- operations on handle
 
-    openFile :: fp -> IOMode -> ErrIO Handle
+    openFile2handle :: fp -> IOMode -> ErrIO Handle
 --    closeFile :: fp ->  Handle -> ErrIO ()
     -- the filepath is used only as phantom ...
         -- use closeFile2 without fp
@@ -196,7 +203,7 @@ class (FileOps fp, Show fp) =>
     readFileOrZero2 :: (FileOps fp, Zeros fc) => fp -> ErrIO fc
     -- | reads file, if not present, returns zero
     readFileOrZero2 fp = do
-        f <- doesFileExist fp
+        f <- doesFileExist' fp
         if f
             then readFile2 fp
             else return zero

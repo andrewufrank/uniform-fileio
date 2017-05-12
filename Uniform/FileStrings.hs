@@ -21,7 +21,10 @@
 module Uniform.FileStrings (htf_thisModulesTests
             , module Uniform.Filenames   -- exports Path
             , module Uniform.FileIOalgebra
-
+            , module Path
+            , module Path.IO
+            , closeFile2
+            , listDir'
 
 --    , readFileT, writeFileT
 
@@ -38,8 +41,11 @@ import           Uniform.Strings hiding ((<.>), (</>))
 import           Test.Framework
 import           Test.Invariant
 
-import qualified Path as P
-import qualified Path.IO as P
+import  Path as P
+import  Path.IO as P
+
+import  Path
+import  Path.IO
 
 -- what is further required?
 import qualified System.IO as SIO
@@ -53,7 +59,8 @@ import           Data.Digest.Pure.MD5  (md5)
 import qualified Data.Text.IO          as T
 import Data.Maybe (catMaybes)
 
-import qualified System.Directory      as S
+import qualified System.Directory      as D
+--import qualified System.Directory      as D
 import qualified System.FilePath       as OS
 --       (addExtension, makeRelative, FilePath, combine, splitPath,
 --        takeDirectory, replaceExtension, takeExtension)
@@ -64,17 +71,28 @@ import           Data.List             (isPrefixOf)
 import Data.Either (isLeft)
 import Control.Exception (catch, SomeException)
 import Control.DeepSeq (($!!), force)
-
+import Control.Monad.IO.Class
+import Control.Monad.Catch
 closeFile2 :: Handle -> ErrIO ()
 -- close a handle, does not need a filepath
 closeFile2 handle = callIO $ SIO.hClose handle
 
+listDir' :: (MonadIO m, MonadThrow m)
+  => Path b Dir        -- ^ Directory to list
+  -> m ([Path Abs Dir], [Path Abs File]) -- ^ Sub-directories and files
+listDir' = P.listDir
+-- would require a class and an implementation for FilePath
+
+instance FileSystemOps FilePath where
+    checkSymbolicLink fp =  callIO $ D.pathIsSymbolicLink ( fp)
+    getPermissions' = callIO . D.getPermissions
+
 instance DirOps FilePath where
-    doesDirExist = callIO . S.doesDirectoryExist
-    renameDir old new = do
+    doesDirExist' = callIO . D.doesDirectoryExist
+    renameDir' old new = do
         putIOwords ["renamed start"]
-        testSource <-  doesDirExist old
-        testTarget <-  doesDirExist new
+        testSource <-  doesDirExist' old
+        testTarget <-  doesDirExist' new
         if testTarget then throwErrorT
 --                signalf  TargetExist
                         [showT new]
@@ -83,23 +101,23 @@ instance DirOps FilePath where
                     [showT old]
                 else do
                      callIO $ putStrLn "renamed"
-                     r <- callIO $ S.renameDirectory (old) (new)
+                     r <- callIO $ D.renameDirectory (old) (new)
                      return $ unwordsT
                         [ "renamed dir from ", showT old
                             , " to " , showT  new]
 
 instance FileOps FilePath  where
-    doesFileExist   = callIO . S.doesFileExist
-
+    doesFileExist'   = callIO . D.doesFileExist
+--    getPermissions' = callIO . D.getPermissions
 
 --    createDir fp = do
 --        t <- doesFileOrDirExist fp
---        if not t then  callIO $ S.createDirectory   fp
+--        if not t then  callIO $ D.createDirectory   fp
 --            else throwErrorT
 --                ["File or Dir exists", showT fp]
 
 
---    createDirIfMissing = callIO . S.createDirectoryIfMissing True
+--    createDirIfMissing = callIO . D.createDirectoryIfMissing True
 --    copyFile old new = do
 --        t <- doesFileExist old
 --        t2 <- doesFileExist new
@@ -108,7 +126,7 @@ instance FileOps FilePath  where
 --            direxist <- doesDirExist   dir
 --            unless direxist $ do
 --                createDirIfMissing  dir
---            callIO $ S.copyFile (old) ( new)
+--            callIO $ D.copyFile (old) ( new)
 --
 --                else if t then  throwErrorT
 --                    ["copyFile source not exist", showT old]
@@ -125,7 +143,7 @@ instance FileOps FilePath  where
 --                direxist <- doesDirExist  dir
 --                unless direxist $ do
 --                    createDirIfMissing  dir
---                callIO $ S.renameFile ( old) ( new)
+--                callIO $ D.renameFile ( old) ( new)
 --
 --            else if not t
 --                then  throwErrorT
@@ -166,7 +184,7 @@ instance FileOps FilePath  where
 --        readExec <- getFileAccess fn (True, False, True)
 --        if testDir && readExec then
 --            do
---               r <- callIO . S.listDirectory $ fn
+--               r <- callIO . D.listDirectory $ fn
 --               let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
 --               let r3 = map (fn </>) r2
 ----               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r]
@@ -180,7 +198,7 @@ instance FileOps FilePath  where
 ----        putIOwords ["getDirContentNonHidden", unL fp]
 --        r <- getDirCont fp
 --        let r2 = filter (not . isHidden) r
-----        r2 <- callIO $ S.listDirectory (unL fp)
+----        r2 <- callIO $ D.listDirectory (unL fp)
 ----          would be possible but filter here is simpler
 ----        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
 ----        let r2 = filter (not . isPrefixOf "." ) r
@@ -189,13 +207,13 @@ instance FileOps FilePath  where
 
     deleteFile f = do
          putIOwords ["delete file ", showT f]
-         callIO . S.removeFile   $ f
+         callIO . D.removeFile   $ f
 
     deleteDirRecursive f =
         do
-            t <- doesDirExist f
+            t <- doesDirExist' f
             when t $ do
-                callIO . S.removeDirectoryRecursive  $  f
+                callIO . D.removeDirectoryRecursive  $  f
 
                 putIOwords ["deleted", showT f]
             return ()
@@ -203,7 +221,7 @@ instance FileOps FilePath  where
 
     getAppConfigDirectory = error "not implemented" -- do
 --        let prefsfileDir = ".config"
---        homeDir <- callIO $ S.getHomeDirectory
+--        homeDir <- callIO $ D.getHomeDirectory
 --        return  (homeDir </> prefsfileDir)
 
 --    getSymbolicLinkStatus :: fp ->   ErrIO (Maybe P.FileStatus)
@@ -227,29 +245,34 @@ instance FileOps FilePath  where
 
         -- fails if broken symbolic link?
 
-    checkSymbolicLink fp =  callIO $ S.pathIsSymbolicLink ( fp)
 
 
-    openFile fp mode = callIO $ SIO.openFile fp mode
+    openFile2handle fp mode = callIO $ SIO.openFile fp mode
 --    closeFile _ handle = callIO $ SIO.hClose handle
 
 --unL = t2s . filepath2text lpX
 --mkL = mkFilepath lpX . s2t
 
+instance FileSystemOps (Path ar df) where
+    getPermissions' = P.getPermissions
+    checkSymbolicLink  fp =   callIO $ D.pathIsSymbolicLink (unL fp)
+
 instance DirOps (P.Path ar Dir)  where
-    doesDirExist =  P.doesDirExist
-    createDir  = P.createDir
+    doesDirExist' =  P.doesDirExist
+--    getDirPermissions = P.getPermissions
+    createDir'  = P.createDir
 --        do
 --        t <- doesFileOrDirExist fp
---        if not t then  callIO $ S.createDirectory . unL $ fp
+--        if not t then  callIO $ D.createDirectory . unL $ fp
 --            else throwErrorT
 --                ["File or Dir exists", showT fp]
 
 
-    createDirIfMissing = P.createDirIfMissing True
+    createDirIfMissing' = P.createDirIfMissing True
 
 instance FileOps (P.Path ar File)  where
-    doesFileExist   =  doesFileExist
+    doesFileExist'   =  P.doesFileExist
+--    getPermissions' = P.getPermissions
 
     getMD5 fp = getMD5 (unL fp)
 -- use listDir which separats result in dir and file list and does not include . and ..
@@ -262,7 +285,7 @@ instance FileOps (P.Path ar File)  where
 ----        putIOwords ["getDirContentNonHidden", unL fp]
 --        r <- getDirCont . unL $ fp
 --        let r2 = filter (not . isHidden) r
-----        r2 <- callIO $ S.listDirectory (unL fp)
+----        r2 <- callIO $ D.listDirectory (unL fp)
 ----          would be possible but filter here is simpler
 ----        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
 ----        let r2 = filter (not . isPrefixOf "." ) r
@@ -270,10 +293,10 @@ instance FileOps (P.Path ar File)  where
 --        let r3 = (map (makeLegalPath . s2t) r2)
 --        return (catMaybes r3)
 
-    openFile fp mode =  openFile (unL fp) mode
+    openFile2handle fp mode =  openFile2handle (unL fp) mode
 --    closeFile fp handle = closeFile (unL fp) handle
 
-    checkSymbolicLink fp =   callIO $ S.pathIsSymbolicLink (unL fp)
+--    checkSymbolicLink fp =   callIO $ D.pathIsSymbolicLink (unL fp)
 
     getFileAccess fp (r,w,e) =
         do
@@ -306,10 +329,10 @@ instance   FileOps2 (Path ar File) String where
 
 instance   FileOps2 (Path ar File) Text where
 
-    readFile2 fp = readFile2  (unL fp)
+    readFile2 fp = readFile2 (unL fp)
     -- a strict read (does cloes?)
 
-    writeFile2  fp st = writeFile2  (unL  fp) st
+    writeFile2  fp st = writeFile2 (unL fp) st
 
 instance FileOps2 FilePath Text where
 
@@ -442,6 +465,13 @@ corruptJPG = "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG"
 ----                putIOwords ["caught with catch in test_md5_catch ", showT e]
 ----                return ()
 
+test_symlink :: IO ()
+test_symlink = do
+    let t =   makeAbsFile "/bin/X11/X11"
+    isSymlink1 <- D.pathIsSymbolicLink   (OS.dropTrailingPathSeparator $ toFilePath t)
+    isSymlink2 <- D.pathIsSymbolicLink "/bin/X11/X11" -- (toFilePath t)
+    isSymlink3 <- D.pathIsSymbolicLink "/bin/X11/X11/" -- (toFilePath t)
+    assertEqual  (True, True, False) (isSymlink1, isSymlink2, isSymlink3)
 
 
 

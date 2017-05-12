@@ -22,6 +22,7 @@ module Uniform.FileIO (
          , module Uniform.Error
          , module Uniform.Strings
          , module Uniform.FileStatus
+         , module Uniform.FileIOalgebra
 --         FileOps (..)
 --         , FileOps2 (..)
 --         , closeFile2
@@ -68,12 +69,12 @@ import qualified System.Posix          as P (FileStatus)
 
 -- using uniform:
 import           Uniform.Error
---import           Uniform.FileIOalgebra
+import           Uniform.FileIOalgebra
 import           Uniform.Filenames
 import           Uniform.FileStatus
 --import           Uniform.FileStrings
 --import           Uniform.Piped
-import           Uniform.Strings hiding ((</>))
+import           Uniform.Strings hiding ((</>), (<.>))
 --import           Uniform.TypedFile
 
 import           Uniform.Zero

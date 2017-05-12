@@ -23,14 +23,15 @@ module Main     where      -- must have Main (main) or Main where
 --import System.Exit
 
 import Test.Framework
---import {-@ HTF_TESTS @-} Uniform.FileIO
+import {-@ HTF_TESTS @-} Uniform.FileIO
 import {-@ HTF_TESTS @-} Uniform.FileStrings
---import {-@ HTF_TESTS @-} FileIO.Text
---import {-@ HTF_TESTS @-} FileIO.ByteString
---import {-@ HTF_TESTS @-} TestingFileIO
---import {-@ HTF_TESTS @-} Uniform.Piped
+----import {-@ HTF_TESTS @-} FileIO.Text
+----import {-@ HTF_TESTS @-} FileIO.ByteString
+----import {-@ HTF_TESTS @-} TestingFileIO
+----import {-@ HTF_TESTS @-} Uniform.Piped
 import {-@ HTF_TESTS @-} Uniform.Filenames
 import {-@ HTF_TESTS @-} Uniform.FileStatus
+import {-@ HTF_TESTS @-} Uniform.TypedFile
 
 import Uniform.Strings
 

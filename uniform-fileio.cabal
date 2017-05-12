@@ -1,5 +1,5 @@
 name: uniform-fileio
-version: 0.0.12.0
+version: 0.0.12.6
 cabal-version: >=1.22
 build-type: Simple
 license: GPL
@@ -29,10 +29,11 @@ library
 --            MissingH, or cryptonite...
             text -any,
             unix -any,
-            pipes ,
+--            pipes ,
             safe,
             path,
             path-io,
+            exceptions,
 -- for tests
             HTF, test-invariant
 --            QuickCheck,
@@ -55,7 +56,7 @@ library
              Uniform.FileIOalgebra
 --             Uniform.FileStrings
              Uniform.FileStatus
---             Uniform.TypedFile
+             Uniform.TypedFile
 --             Uniform.FileText
     exposed: True
     buildable: True
