@@ -24,6 +24,7 @@ module Uniform.FileIO (
          , module Uniform.FileStatus
          , module Uniform.FileIOalgebra
          , module Uniform.TypedFile
+         , module Uniform.FileStrings
 --         FileOps (..)
 --         , FileOps2 (..)
 --         , closeFile2

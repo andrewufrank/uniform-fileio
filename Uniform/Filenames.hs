@@ -38,7 +38,6 @@ import           Uniform.Strings     hiding ((</>), (<.>))
             -- (s2t, showT, t2s, removeChar, CharChains2 (..), Text)
 import Safe   -- todo error
 import Path  -- should I hide the quasi quoters?
-
 --import qualified          System.Posix.FilePath as P
 
 import  qualified         System.FilePath       as S -- prefered
@@ -47,9 +46,13 @@ import Test.Framework
 import Test.Invariant
 
 
+makeRelFile :: FilePath -> Path Rel File
+makeRelDir :: FilePath -> Path Rel Dir
+makeAbsFile :: FilePath -> Path Abs File
+makeAbsDir :: FilePath -> Path Abs Dir
 
 makeRelFile fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseRelFile fn
-makeRelDir fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseRelFile fn
+makeRelDir fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseRelDir fn
 makeAbsFile fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseAbsFile fn
 makeAbsDir fn = fromJustNote ("makeFilenameAbsDir " ++ fn) $ parseAbsDir fn
 

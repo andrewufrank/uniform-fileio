@@ -1,5 +1,5 @@
 name: uniform-fileio
-version: 0.0.12.8
+version: 0.0.12.10
 cabal-version: >=1.22
 build-type: Simple
 license: GPL

@@ -31,14 +31,25 @@ class TypedFiles5 a b where
 -- | reads or writes  a structured file with the specified parsers or writer
 -- the first parameter is the type of file, the second an arbitrary differentiation
 -- to allow two file types with different extension and read
-  mkTypedFile5 :: TypedFile5 a b
-  -- using a dummy argument for type specification is possible,
-  -- but does not seem a good idea
-  write5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
-  -- write a file, directory is created if not exist
-  -- file, if exist, is replaced
-  read5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
+    mkTypedFile5  ::  TypedFile5 a b
+    -- no argument, the extension is encapsulated in instance def
+    write5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
+    -- write a file, directory is created if not exist
+    -- file, if exist, is replaced
+    read5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
 
+
+-- generic instance is not possible becuase
+-- it is not known whether this is a file to open with filepath or path-io
+--instance TypedFiles a b where
+--    write5 fp fn tp  ct = do
+--        dirx <- ensureDir fp
+--        let fn2 = fn <.> tpext5 tp -- :: Path ar File
+--        writeFile2 (fp </> fn2 ) ct
+--    read5 fp fn tp   = do
+--        let fn2 = fn <.> (tpext5 tp)
+--        readFile2 (fp </> fn2)
+--
 
 instance TypedFiles5 [Text] () where
     -- file contains a list of lines (text)
