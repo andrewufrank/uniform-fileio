@@ -73,6 +73,7 @@ import Control.Exception (catch, SomeException)
 import Control.DeepSeq (($!!), force)
 import Control.Monad.IO.Class
 import Control.Monad.Catch
+
 closeFile2 :: Handle -> ErrIO ()
 -- close a handle, does not need a filepath
 closeFile2 handle = callIO $ SIO.hClose handle
