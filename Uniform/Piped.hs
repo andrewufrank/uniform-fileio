@@ -52,7 +52,7 @@ import Test.Framework
 
 getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())
                   Path Abs Dir
-                      -> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ()
+                      -> Pipe.Proxy Pipe.X () () (Path Abs File) (ErrorT Text IO) ()
 getRecursiveContents  fp = do
 --    putIOwords ["recurseDir start", showT fp]
     perm <-Pipe.lift $ getPermissions' fp
@@ -64,7 +64,7 @@ getRecursiveContents  fp = do
                 then  Pipe.lift $ putIOwords ["recurseDir symlink", showT fp]
                 else do
                     (dirs, files) <- Pipe.lift   $ listDir  fp
-                    Prelude.mapM_ (Pipe.yield . toFilePath) (sort files)
+                    Prelude.mapM_ (Pipe.yield) (sort files)
                     Prelude.mapM_ (getRecursiveContents) (sort dirs)
                     return ()--    where processOneFile fp = Pipe.yield fp
 
@@ -78,11 +78,11 @@ test_recursive = do
         hand <-   openFile2handle resfileN WriteMode
         Pipe.runEffect $
             getRecursiveContents testdir2
---            >-> PipePrelude.mapM (  toFilePath)
+            >-> PipePrelude.map  toFilePath
     ----    >-> P.stdoutLn
             >-> PipePrelude.toHandle hand
         closeFile2 hand
-    res0  ::Text <- (readFile5  resfile0)
+    res0  ::Text <-  readFile5  resfile0
     resN :: Text <-  readFile5 resfileN
     assertEqual res0 resN
 

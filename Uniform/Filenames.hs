@@ -66,6 +66,13 @@ instance CharChains2 (Path a d) Text where show'  = s2t . show
 newtype Extension = Extension FilePath deriving (Show, Read, Eq, Ord)
 unExtension (Extension e) = e
 
+class Filenames fp fr where
+    getFileName :: fp -> fr
+
+instance Filenames FilePath FilePath where
+    getFileName = snd . S.splitFileName
+instance Filenames (Path ar File) (Path Rel File) where
+    getFileName = filename
 
 class (Eq (ExtensionType fp)) => Extensions fp where
     type ExtensionType fp
@@ -102,7 +109,7 @@ instance Extensions (Path ar File) where
     getExtension f = Extension . removeChar '.' . Path.fileExtension $ f
     setExtension e = Path.setFileExtension (unExtension e)
     addExtension e f  = Path.setFileExtension (unExtension e) f
-    removeExtension f = error "removeExtension is not easy to implement"
+    removeExtension   = fromJustNote "removeExtension" . setExtension (Extension "")
 --    hasExtension e f = (e==). getExtension
 
 ------------------tests
@@ -140,7 +147,7 @@ test_getExt_P = assertEqual e1 (getExtension g2)
 test_hasExt_P = assertBool $  hasExtension e1 g2
 test_hasExt2_P = assertBool $  hasExtension e1 g2
 test_addExt_P = assertEqual (Just g2) $  addExtension e1 g1
---test_removeExt_P = assertEqual g1 (removeExtension g2)
+test_removeExt_P = assertEqual g1 (removeExtension g2)
 test_setExt_P = assertEqual (Just g4) (setExtension (Extension "txt") g3)
 
 --instance Arbitrary (Path Rel File) where

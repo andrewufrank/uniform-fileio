@@ -25,6 +25,7 @@ module Uniform.FileIO (
          , module Uniform.FileIOalgebra
          , module Uniform.TypedFile
          , module Uniform.FileStrings
+         , module Uniform.Piped
 --         FileOps (..)
 --         , FileOps2 (..)
 --         , closeFile2
@@ -75,7 +76,7 @@ import           Uniform.FileIOalgebra
 import           Uniform.Filenames
 import           Uniform.FileStatus
 import           Uniform.FileStrings
---import           Uniform.Piped
+import           Uniform.Piped
 import           Uniform.Strings hiding ((</>), (<.>))
 import           Uniform.TypedFile
 
