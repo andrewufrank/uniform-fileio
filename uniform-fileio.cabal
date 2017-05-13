@@ -29,7 +29,7 @@ library
 --            MissingH, or cryptonite...
             text -any,
             unix -any,
---            pipes ,
+            pipes ,
             safe,
             path,
             path-io,
@@ -41,7 +41,7 @@ library
 --            basics
 --                    stringConversion  -- moved to bascis
             , uniform-strings >=0.0.9
-            , uniform-error >=0.0.9
+            , uniform-error >=0.0.9.6
             , uniform-algebras
 
     exposed-modules:
@@ -52,7 +52,7 @@ library
              -- exposed only for test use
              Uniform.FileStrings
 
---             Uniform.Piped
+             Uniform.Piped
              Uniform.FileIOalgebra
 --             Uniform.FileStrings
              Uniform.FileStatus

@@ -25,6 +25,7 @@ module Uniform.FileStrings (htf_thisModulesTests
             , module Path.IO
             , closeFile2
             , listDir'
+            , readFile5
 
 --    , readFileT, writeFileT
 
@@ -77,6 +78,11 @@ import Control.Monad.Catch
 closeFile2 :: Handle -> ErrIO ()
 -- close a handle, does not need a filepath
 closeFile2 handle = callIO $ SIO.hClose handle
+
+--for testing:
+readFile5 :: Path ar File -> IO Text
+readFile5 = fmap s2t .readFile . toFilePath
+
 
 listDir' :: (MonadIO m, MonadThrow m)
   => Path b Dir        -- ^ Directory to list
