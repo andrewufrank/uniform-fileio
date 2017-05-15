@@ -150,8 +150,7 @@ class FileOps fp   where
 -- operations on handle
 
     openFile2handle :: fp -> IOMode -> ErrIO Handle
---    closeFile :: fp ->  Handle -> ErrIO ()
-    -- the filepath is used only as phantom ...
+-- use hPutStr :: Handle -> Text -> IO ()
         -- use closeFile2 without fp
 
 
@@ -160,6 +159,7 @@ class FileOps fp   where
 --
 --    readFile3 :: fp -> m fc
 --    writeFile3 :: fp -> fc -> m ()
+
 
 --
 --

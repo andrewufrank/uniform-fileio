@@ -37,6 +37,10 @@ class TypedFiles5 a b where
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
     read5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
+    write6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
+    -- write a file, directory is created if not exist
+    -- file, if exist, is replaced
+    read6 ::   Path Abs File -> TypedFile5 a b ->   ErrIO a
 
 
 -- generic instance is not possible becuase
