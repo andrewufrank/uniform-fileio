@@ -121,8 +121,10 @@ instance Extensions (Path ar File) where
     removeExtension   = fromJustNote "removeExtension" . setExtension (Extension "")
 --    hasExtension e f = (e==). getExtension
 
-instance AnyPath FilePath where
-    makeAbsolute t =  return $ AbsPath (makeAbsFile "testesss")
+--instance AnyPath FilePath where
+--    makeAbsolute t =  do
+--            let f = (makeAbsFile "testesss")
+--            return $ AbsPath (makeAbsFile "testesss")
 ------------------tests
 
 -- rigerous filepath testing is difficult, as many inputs are not leading to leagal path
