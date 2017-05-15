@@ -39,7 +39,7 @@ import           Uniform.Strings     hiding ((</>), (<.>))
 import Safe   -- todo error
 import Path  -- should I hide the quasi quoters?
 --import qualified          System.Posix.FilePath as P
-
+import Path.IO
 import  qualified         System.FilePath       as S -- prefered
 
 import Test.Framework
@@ -51,10 +51,10 @@ makeRelDir :: FilePath -> Path Rel Dir
 makeAbsFile :: FilePath -> Path Abs File
 makeAbsDir :: FilePath -> Path Abs Dir
 
-makeRelFile fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseRelFile fn
-makeRelDir fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseRelDir fn
-makeAbsFile fn = fromJustNote ("makeFilenameRelFile " ++ fn) $ parseAbsFile fn
-makeAbsDir fn = fromJustNote ("makeFilenameAbsDir " ++ fn) $ parseAbsDir fn
+makeRelFile fn = fromJustNote ("makeRelFile " ++ fn) $ parseRelFile fn
+makeRelDir fn = fromJustNote ("makeRelDir " ++ fn) $ parseRelDir fn
+makeAbsFile fn = fromJustNote ("makeAbsFile " ++ fn) $ parseAbsFile fn
+makeAbsDir fn = fromJustNote ("makeAbsDir " ++ fn) $ parseAbsDir fn
 
 toShortFilePath :: Path df ar -> FilePath
 ---- ^ get the filepath, but without the trailing separator, necessary for systemcalls
@@ -68,11 +68,20 @@ unExtension (Extension e) = e
 
 class Filenames fp fr where
     getFileName :: fp -> fr
-
+--class Filenames1 fp where
+--    getImmediateParentDir :: fp -> FilePath
+--    -- ^ the parent dir of file
+--    getNakedFileName :: fp -> FilePath
+--    -- ^ filename without extension
 instance Filenames FilePath FilePath where
     getFileName = snd . S.splitFileName
+--    getNakedFileName =
 instance Filenames (Path ar File) (Path Rel File) where
     getFileName = filename
+--instance Filenames1 (Path ar File)   where
+--    getNakedFileName = toFilePath . removeExtension
+--    getImmediateParentDir =  S.dropTrailingPathSeparator .
+--                   toFilePath . dirname . parent
 
 class (Eq (ExtensionType fp)) => Extensions fp where
     type ExtensionType fp
@@ -112,6 +121,8 @@ instance Extensions (Path ar File) where
     removeExtension   = fromJustNote "removeExtension" . setExtension (Extension "")
 --    hasExtension e f = (e==). getExtension
 
+instance AnyPath FilePath where
+    makeAbsolute t =  return $ AbsPath (makeAbsFile "testesss")
 ------------------tests
 
 -- rigerous filepath testing is difficult, as many inputs are not leading to leagal path
