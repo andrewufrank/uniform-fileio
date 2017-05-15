@@ -68,20 +68,36 @@ unExtension (Extension e) = e
 
 class Filenames fp fr where
     getFileName :: fp -> fr
---class Filenames1 fp where
---    getImmediateParentDir :: fp -> FilePath
---    -- ^ the parent dir of file
---    getNakedFileName :: fp -> FilePath
---    -- ^ filename without extension
+
+class Filenames1 fp where
+    -- instantiate only for filepath
+    getImmediateParentDir :: fp -> FilePath
+    -- ^ the parent dir of file
+    getNakedFileName :: fp -> FilePath
+    -- ^ filename without extension
+
 instance Filenames FilePath FilePath where
     getFileName = snd . S.splitFileName
 --    getNakedFileName =
 instance Filenames (Path ar File) (Path Rel File) where
     getFileName = filename
---instance Filenames1 (Path ar File)   where
---    getNakedFileName = toFilePath . removeExtension
---    getImmediateParentDir =  S.dropTrailingPathSeparator .
---                   toFilePath . dirname . parent
+
+instance Filenames1 (Path ar File)   where
+    getNakedFileName =   getNakedFileName . toFilePath
+    getImmediateParentDir = getImmediateParentDir . toFilePath
+
+instance Filenames1 FilePath   where
+    getNakedFileName =   removeExtension . getFileName
+    getImmediateParentDir = (!! 1) . reverse . S.splitDirectories
+
+testname = "/home/frank/dir1/file.ext" :: FilePath
+test_immediateParent = assertEqual "dir1" (getImmediateParentDir testname)
+test_nakedFilename = assertEqual "file" (getNakedFileName testname)
+
+testname2 = makeAbsFile testname
+
+test_immediateParent2 = assertEqual "dir1" (getImmediateParentDir testname2)
+test_nakedFilename2 = assertEqual "file" (getNakedFileName testname2)
 
 class (Eq (ExtensionType fp)) => Extensions fp where
     type ExtensionType fp
