@@ -57,7 +57,8 @@ import qualified Data.ByteString       as BS (readFile, writeFile)
 import qualified Data.ByteString.Lazy  as L
 import           Data.Digest.Pure.MD5  (md5)
 --import Data.Hash.MD5 (md5s)
-import qualified Data.Text.IO          as T
+import qualified Data.Text.IO          as T (readFile, writeFile)
+import qualified Data.Text.IO          as TIO (hPutStr, hGetLine)
 import Data.Maybe (catMaybes)
 
 import qualified System.Directory      as D
@@ -78,6 +79,14 @@ import Control.Monad.Catch
 closeFile2 :: Handle -> ErrIO ()
 -- close a handle, does not need a filepath
 closeFile2 handle = callIO $ SIO.hClose handle
+
+instance FileHandles String where
+    write2handle h c = callIO $ SIO.hPutStr h c
+    readLine4handle h = callIO $ SIO.hGetLine h
+
+instance FileHandles Text where
+    write2handle h c = callIO $ TIO.hPutStr h c
+    readLine4handle h = callIO $ TIO.hGetLine h
 
 --for testing:
 readFile5 :: Path ar File -> IO Text

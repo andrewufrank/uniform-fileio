@@ -27,6 +27,7 @@
 module Uniform.FileIOalgebra (
          FileOps (..), DirOps (..), FileSystemOps (..)
          , FileOps2 (..)
+         , FileHandles (..)
         , Handle , IOMode (..)
 
          , module Uniform.Error
@@ -75,6 +76,12 @@ import System.IO (Handle, IOMode (..) )
 ---- | operations on files and directories
 ---- the doesXX do not produce any exceptiosn
 -- is polymorph either in LegalFilename or in RawFilePath (i.e. bytestring )
+
+class FileHandles t where
+    write2handle :: Handle -> t -> ErrIO ()
+    -- write a string or text to a handle
+    readLine4handle :: Handle -> ErrIO t
+    -- read a lline from a handle - used?
 
 --class ListDir d f where
 --    listDir' :: d -> ErrIO ([d],[f])
