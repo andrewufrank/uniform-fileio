@@ -36,7 +36,7 @@ module Uniform.Filenames  (
 import           Uniform.Error
 import           Uniform.Strings     hiding ((</>), (<.>))
             -- (s2t, showT, t2s, removeChar, CharChains2 (..), Text)
-import Safe   -- todo error
+--import Safe   -- todo error
 import Path  -- should I hide the quasi quoters?
 --import qualified          System.Posix.FilePath as P
 import Path.IO
