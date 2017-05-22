@@ -25,11 +25,11 @@
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.FileIOalgebra (
-         FileOps (..), DirOps (..), FileSystemOps (..)
-         , FileOps2 (..)
-         , FileHandles (..)
-        , Handle , IOMode (..)
-
+--         FileOps (..), DirOps (..), FileSystemOps (..)
+--         , FileOps2 (..)
+--         , FileHandles (..)
+--        , Handle , IOMode (..)
+        module Uniform.FileIOalgebra
          , module Uniform.Error
          , module Uniform.Zero
 

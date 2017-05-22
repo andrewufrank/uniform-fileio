@@ -25,7 +25,7 @@ module Uniform.Filenames  (
          , module Path
          , module Uniform.Error
          , module Uniform.Strings
-          , htf_thisModulesTests
+--          , htf_thisModulesTests
              ) where
 --
 -- --import qualified Data.Text as T
@@ -37,10 +37,12 @@ import           Uniform.Error
 import           Uniform.Strings     hiding ((</>), (<.>))
             -- (s2t, showT, t2s, removeChar, CharChains2 (..), Text)
 --import Safe   -- todo error
-import Path  -- should I hide the quasi quoters?
+import Path   hiding ( (</>) ) -- should I hide the quasi quoters?
+import qualified Path   ((</>))
 --import qualified          System.Posix.FilePath as P
 import Path.IO
 import  qualified         System.FilePath       as S -- prefered
+import  qualified         System.FilePath.Posix       as S -- prefered
 
 import Test.Framework
 import Test.Invariant
@@ -68,6 +70,10 @@ unExtension (Extension e) = e
 
 class Filenames fp fr where
     getFileName :: fp -> fr
+class Filenames3 fp file  where
+    type FileResultT fp file
+    -- add a filepath to a absolute dir and givev an absolte file
+    (</>)  :: fp -> file -> FileResultT fp file
 
 class Filenames1 fp where
     -- instantiate only for filepath
@@ -78,9 +84,21 @@ class Filenames1 fp where
 
 instance Filenames FilePath FilePath where
     getFileName = snd . S.splitFileName
---    getNakedFileName =
+instance Filenames3 FilePath FilePath  where
+    type FileResultT FilePath FilePath = FilePath
+    p </>  d  = S.combine p d
+
 instance Filenames (Path ar File) (Path Rel File) where
     getFileName = filename
+
+instance Filenames3 (Path b Dir) FilePath  where
+    type FileResultT (Path b Dir) FilePath = (Path b File)
+    p </> d =  (Path.</>) p d2
+        where
+            d2 = makeRelFile d :: Path Rel File
+instance Filenames3 (Path b Dir) (Path Rel t)  where
+    type FileResultT (Path b Dir) (Path Rel t) = (Path b t)
+    p </> d =  (Path.</>) p d
 
 instance Filenames1 (Path ar File)   where
     getNakedFileName =   getNakedFileName . toFilePath

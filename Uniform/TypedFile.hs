@@ -33,10 +33,10 @@ class TypedFiles5 a b where
 -- to allow two file types with different extension and read
     mkTypedFile5  ::  TypedFile5 a b
     -- no argument, the extension is encapsulated in instance def
-    write5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
+    write5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
-    read5 :: Path ar Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
+    read5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
     write6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
@@ -65,7 +65,7 @@ instance TypedFiles5 [Text] () where
 --      writeFile2 (fp </> (fn <.> (tpext tp) )) . unlines'
     read5 fp fn tp   = do
         let fn2 = fn <.> (tpext5 tp)
-        fmap lines' $ readFile2 (fp </> fn2)
+        fmap lines' $ readFile2 (fp </> fn2 )
 --    $ readFile2 (fp </> (fn <.> (tpext tp) ))
 
 textLinesFile = mkTypedFile5  ::TypedFile5 [Text] ()

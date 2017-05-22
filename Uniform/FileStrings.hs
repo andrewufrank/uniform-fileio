@@ -21,8 +21,9 @@
 module Uniform.FileStrings (htf_thisModulesTests
             , module Uniform.Filenames   -- exports Path
             , module Uniform.FileIOalgebra
-            , module Path
+--            , module Path
             , module Path.IO
+            , SIO.IOMode (..)  -- from System.IO
             , closeFile2
             , listDir'
             , readFile5
@@ -76,7 +77,7 @@ import Control.DeepSeq (($!!), force)
 import Control.Monad.IO.Class
 import Control.Monad.Catch
 
-closeFile2 :: Handle -> ErrIO ()
+closeFile2 :: SIO.Handle -> ErrIO ()
 -- close a handle, does not need a filepath
 closeFile2 handle = callIO $ SIO.hClose handle
 
