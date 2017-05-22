@@ -1,5 +1,5 @@
 name: uniform-fileio
-version: 0.0.12.16
+version: 0.0.12.16.1
 cabal-version: >=1.22
 build-type: Simple
 license: GPL
@@ -40,8 +40,8 @@ library
 -- mine
 --            basics
 --                    stringConversion  -- moved to bascis
-            , uniform-strings >=0.0.9
-            , uniform-error >=0.0.9.6
+            , uniform-strings
+            , uniform-error 
             , uniform-algebras
 
     exposed-modules:
