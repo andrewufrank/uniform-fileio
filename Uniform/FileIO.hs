@@ -19,50 +19,13 @@
 
 module Uniform.FileIO (
         module Uniform.Filenames
-         , module Uniform.Error
-         , module Uniform.Strings
+        --  , module Uniform.Error
+        --  , module Uniform.Strings
          , module Uniform.FileStatus
          , module Uniform.FileIOalgebra
          , module Uniform.TypedFile
          , module Uniform.FileStrings
          , module Uniform.Piped
---         FileOps (..)
---         , FileOps2 (..)
---         , closeFile2
---         , Filepathes (..), unL
---         , lpX, fpX
---         , t2fp  -- convert text to filepath, is t2s
---         , attachToFileName
-----         , CV2legal (..)
-----         , CV2paths (..)
-----        --  , (</>), (<.>)
-----         , FNstrings (..)
-----         , Hiddings(..)
-------         , getFilepathS, dirs2path, makeLegalPath
-----        --  , module Uniform.Filenames  -- export only these functions
---        , LegalPathname (..)
-----        , unLegalPathname, unL, makeLegalPath
---        , LegalFilename
-----            (..), unLegalFilename, makeLegalFilename
---        , LegalExtension
---            --(..), makeLegalExtension
-----        , attachToFileName
-----        , getFilenameS
-----        , FPtype   -- should not be used
-----        -- , FPtype
-----         , module Uniform.FileStatus
-----         , P.FileStatus
---         , module Uniform.FileStrings
---         , module Uniform.TypedFile
-
---         , getModificationTime
---         , P.FileStatus
---         , pipedDo, pipedDoIO
---         , getRecursiveContents
-         , htf_thisModulesTests
---         ,legalpathnameConstructor
-                -- LegalPathname is not available as a constructor
-
             ) where
 
 --import qualified Data.Text as T
@@ -71,13 +34,13 @@ import qualified System.Posix          as P (FileStatus)
 --import System.IO (Handle, IOMode (..))
 
 -- using uniform:
-import           Uniform.Error
-import           Uniform.FileIOalgebra
+-- import           Uniform.Error
+import           Uniform.FileIOalgebra hiding ((<.>), (</>))
 import           Uniform.Filenames
 import           Uniform.FileStatus
 import           Uniform.FileStrings
 import           Uniform.Piped
-import           Uniform.Strings hiding ((</>), (<.>))
+-- import           Uniform.Strings hiding ((</>), (<.>))
 import           Uniform.TypedFile
 
 import           Uniform.Zero

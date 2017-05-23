@@ -24,7 +24,7 @@ module Uniform.Filenames  (
          module Uniform.Filenames
          , module Path
          , module Uniform.Error
-         , module Uniform.Strings
+        --  , module Uniform.Strings
 --          , htf_thisModulesTests
              ) where
 --
@@ -33,8 +33,8 @@ module Uniform.Filenames  (
 -- --import qualified System.Directory as S
 --
 ---- using uniform:
-import           Uniform.Error
-import           Uniform.Strings     hiding ((</>), (<.>))
+import           Uniform.Error hiding ((</>), (<.>))
+-- import           Uniform.Strings     hiding ((</>), (<.>))
             -- (s2t, showT, t2s, removeChar, CharChains2 (..), Text)
 --import Safe   -- todo error
 import Path   hiding ( (</>) ) -- should I hide the quasi quoters?
@@ -45,7 +45,7 @@ import  qualified         System.FilePath       as S -- prefered
 import  qualified         System.FilePath.Posix       as S -- prefered
 
 import Test.Framework
-import Test.Invariant
+-- import Test.Invariant
 
 
 makeRelFile :: FilePath -> Path Rel File

@@ -21,14 +21,15 @@
 {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 
-module FileIO.ByteString ( RawFilePath
+module FileIO.ByteString (
+    module FileIO.ByteString
     , module FileIO.FileIO
     , htf_thisModulesTests
 ) where
 
 -- using uniform
 import Uniform.Error
-import Data.Strings
+-- import Data.Strings
 import FileIO.FileIO
 
 import Test.Framework

@@ -34,48 +34,48 @@ module Uniform.FileStrings (htf_thisModulesTests
 
 -- using uniform
 --import Uniform.Error
-import           Uniform.FileIOalgebra
+import           Uniform.FileIOalgebra  hiding ((<.>), (</>))
 --import           Uniform.FilenamesAlgebra
-import           Uniform.Filenames -- (makeLegalPath)
+import           Uniform.Filenames
 import           Uniform.FileStatus
-import           Uniform.Strings hiding ((<.>), (</>))
+-- import           Uniform.Strings hiding ((<.>), (</>))
 
 import           Test.Framework
 import           Test.Invariant
 
-import  Path as P
-import  Path.IO as P
+import           Path                   as P
+import           Path.IO                as P
 
-import  Path
-import  Path.IO
+import           Path
+import           Path.IO
 
 -- what is further required?
-import qualified System.IO as SIO
-import System.Posix (FileMode)
+import qualified System.IO              as SIO
+import           System.Posix           (FileMode)
 
 
-import qualified Data.ByteString       as BS (readFile, writeFile)
-import qualified Data.ByteString.Lazy  as L
-import           Data.Digest.Pure.MD5  (md5)
+import qualified Data.ByteString        as BS (readFile, writeFile)
+import qualified Data.ByteString.Lazy   as L
+import           Data.Digest.Pure.MD5   (md5)
 --import Data.Hash.MD5 (md5s)
-import qualified Data.Text.IO          as T (readFile, writeFile)
-import qualified Data.Text.IO          as TIO (hPutStr, hGetLine)
-import Data.Maybe (catMaybes)
+import           Data.Maybe             (catMaybes)
+import qualified Data.Text.IO           as T (readFile, writeFile)
+import qualified Data.Text.IO           as TIO (hGetLine, hPutStr)
 
-import qualified System.Directory      as D
+import qualified System.Directory       as D
 --import qualified System.Directory      as D
-import qualified System.FilePath       as OS
+import qualified System.FilePath        as OS
 --       (addExtension, makeRelative, FilePath, combine, splitPath,
 --        takeDirectory, replaceExtension, takeExtension)
-import qualified System.Posix          as P
+import qualified System.Posix           as P
 -- for fileAccess
-import           Control.Arrow         (second)
-import           Data.List             (isPrefixOf)
-import Data.Either (isLeft)
-import Control.Exception (catch, SomeException)
-import Control.DeepSeq (($!!), force)
-import Control.Monad.IO.Class
-import Control.Monad.Catch
+import           Control.Arrow          (second)
+import           Control.DeepSeq        (force, ($!!))
+import           Control.Exception      (SomeException, catch)
+import           Control.Monad.Catch
+import           Control.Monad.IO.Class
+import           Data.Either            (isLeft)
+import           Data.List              (isPrefixOf)
 
 closeFile2 :: SIO.Handle -> ErrIO ()
 -- close a handle, does not need a filepath
@@ -459,6 +459,7 @@ test_md5_nonReadable = do
 
 corruptJPG = "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG" ::FilePath
 
+test_fail = assertEqual "Fail intentionally just to insure that tests are run"(""::Text)
 -- readable on santafe but not oporto
 --test_md5_nonReadable2 :: IO ()
 --test_md5_nonReadable2 = do
@@ -489,7 +490,3 @@ test_symlink = do
     isSymlink2 <- D.pathIsSymbolicLink "/bin/X11/X11" -- (toFilePath t)
     isSymlink3 <- D.pathIsSymbolicLink "/bin/X11/X11/" -- (toFilePath t)
     assertEqual  (True, True, False) (isSymlink1, isSymlink2, isSymlink3)
-
-
-
-

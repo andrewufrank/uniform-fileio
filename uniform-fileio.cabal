@@ -1,5 +1,5 @@
 name: uniform-fileio
-version: 0.0.12.16.1
+version: 0.0.12.16.2
 cabal-version: >=1.22
 build-type: Simple
 license: GPL
@@ -41,14 +41,14 @@ library
 --            basics
 --                    stringConversion  -- moved to bascis
             , uniform-strings
-            , uniform-error 
+            , uniform-error
             , uniform-algebras
 
     exposed-modules:
 --             FileIO.ByteString
 --             Uniform.Filenames
              Uniform.Filenames
-             Uniform.FileIO
+            --  Uniform.FileIO
              -- exposed only for test use
              Uniform.FileStrings
 

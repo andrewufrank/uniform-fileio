@@ -25,29 +25,9 @@
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.FileIOalgebra (
---         FileOps (..), DirOps (..), FileSystemOps (..)
---         , FileOps2 (..)
---         , FileHandles (..)
---        , Handle , IOMode (..)
         module Uniform.FileIOalgebra
          , module Uniform.Error
          , module Uniform.Zero
-
---         , LegalPathname, unLegalPathname
---         , LegalFilename(..)
---         , LegalExtension (..)
---         , CV2legal (..)
---         , CV2paths (..)
-----         , (</>), (<.>)
---         , FNstrings (..)
---         , Hiddings(..)
---         , getFilepathS, dirs2path, makeLegalPath
---         , P.FileStatus
---         , FPtype
---         , pipedDo, pipedDoIO
---            , getRecursiveContents
---    , htf_thisModulesTests
-
             ) where
 
 
@@ -60,22 +40,6 @@ import           Uniform.Error
 import           Uniform.Zero
 --import           Uniform.FilenamesAlgebra
 import System.IO (Handle, IOMode (..) )
---import System.Posix (FileMode)
-
---import Uniform.Strings
---
---import Uniform.Filenames
---import Uniform.Piped
---
---import Test.Framework
---import Test.Invariant
---
---import Control.Arrow (first, second)
---import qualified System.FilePath as OS
-
----- | operations on files and directories
----- the doesXX do not produce any exceptiosn
--- is polymorph either in LegalFilename or in RawFilePath (i.e. bytestring )
 
 class FileHandles t where
     write2handle :: Handle -> t -> ErrIO ()
