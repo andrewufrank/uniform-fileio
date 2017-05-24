@@ -31,12 +31,15 @@ class TypedFiles5 a b where
 -- | reads or writes  a structured file with the specified parsers or writer
 -- the first parameter is the type of file, the second an arbitrary differentiation
 -- to allow two file types with different extension and read
+-- the b can be () if no differentiation is desired
     mkTypedFile5  ::  TypedFile5 a b
     -- no argument, the extension is encapsulated in instance def
     write5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
+    append5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
     read5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
+
     write6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
@@ -65,15 +68,13 @@ instance TypedFiles5 [Text] () where
         let fn2 = fn <.> tpext5 tp -- :: Path ar File
         writeFile2 (fp </> fn2 ) (unlines' ct)
 --      writeFile2 (fp </> (fn <.> (tpext tp) )) . unlines'
-    write5 fp fn tp  ct = do
+    append5 fp fn tp  ct = do
         dirx <- ensureDir fp
         let fn2 = fn <.> tpext5 tp -- :: Path ar File
-        writeFile2 (fp </> fn2 ) (unlines' ct)
---      writeFile2 (fp </> (fn <.> (tpext tp) )) . unlines'
+        appendFile2 (fp </> fn2 ) (unlines' ct)
     read5 fp fn tp   = do
-        let fn2 = fn <.> (tpext5 tp)
-        fmap lines' $ readFile2 (fp </> fn2 )
---    $ readFile2 (fp </> (fn <.> (tpext tp) ))
+        let fn2 = fn <.> tpext5 tp
+        fmap lines' . readFile2 $ fp </> fn2
 
 textLinesFile = mkTypedFile5  ::TypedFile5 [Text] ()
 dir1 = makeAbsDir "/home/frank/"
