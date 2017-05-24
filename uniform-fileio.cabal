@@ -1,5 +1,5 @@
 name: uniform-fileio
-version: 0.0.12.16.2
+version: 0.0.12.16.3
 cabal-version: >=1.22
 build-type: Simple
 license: GPL
@@ -45,10 +45,10 @@ library
             , uniform-algebras
 
     exposed-modules:
+             Uniform.FileIO
 --             FileIO.ByteString
 --             Uniform.Filenames
              Uniform.Filenames
-            --  Uniform.FileIO
              -- exposed only for test use
              Uniform.FileStrings
 

@@ -36,7 +36,7 @@ import qualified System.Posix  as Posix (FileStatus)
 import qualified System.Directory as D
 
 ---- using uniform:
-import           Uniform.Error
+import           Uniform.Error --hiding ((<.>), (</>))
 import           Uniform.Zero
 --import           Uniform.FilenamesAlgebra
 import System.IO (Handle, IOMode (..) )

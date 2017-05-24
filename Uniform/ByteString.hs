@@ -120,9 +120,10 @@ instance FileOps2 RawFilePath T.Text where
 
     readFile2 fp = callIO $  T.readFile  (b2s fp)
     writeFile2  fp st = callIO  $  T.writeFile  (b2s fp) st
+    appendFile2  fp st = callIO  $  T.appendFile  (b2s fp) st
 
 instance  FileOps2 RawFilePath BS.ByteString where
 
     readFile2 fp = callIO $ BS.readFile  (b2s fp)
-
     writeFile2  fp st = callIO $ BS.writeFile  (b2s fp) st
+    appendFile2  fp st = callIO  $  BS.appendFile  (b2s fp) st

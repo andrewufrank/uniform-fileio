@@ -34,7 +34,7 @@ module Uniform.FileStrings (htf_thisModulesTests
 
 -- using uniform
 --import Uniform.Error
-import           Uniform.FileIOalgebra  hiding ((<.>), (</>))
+import           Uniform.FileIOalgebra
 --import           Uniform.FilenamesAlgebra
 import           Uniform.Filenames
 import           Uniform.FileStatus
@@ -59,7 +59,7 @@ import qualified Data.ByteString.Lazy   as L
 import           Data.Digest.Pure.MD5   (md5)
 --import Data.Hash.MD5 (md5s)
 import           Data.Maybe             (catMaybes)
-import qualified Data.Text.IO           as T (readFile, writeFile)
+import qualified Data.Text.IO           as T (readFile, writeFile, appendFile)
 import qualified Data.Text.IO           as TIO (hGetLine, hPutStr)
 
 import qualified System.Directory       as D
@@ -340,34 +340,34 @@ instance   FileOps2 (Path ar File) String where
 
     readFile2 fp = callIO $ readFile   (unL fp)
     -- a strict read (does cloes?)
-
     writeFile2  fp st = callIO $ writeFile   (unL  fp) st
+    appendFile2  fp st = callIO  $   appendFile  (unL fp) st
 
 
 instance   FileOps2 (Path ar File) Text where
 
     readFile2 fp = readFile2 (unL fp)
     -- a strict read (does cloes?)
-
     writeFile2  fp st = writeFile2 (unL fp) st
+    appendFile2  fp st = appendFile2  (unL fp) st
 
 instance FileOps2 FilePath Text where
 
     readFile2 fp = callIO $  T.readFile fp
-
     writeFile2  fp st = callIO $  T.writeFile fp st
+    appendFile2  fp st = callIO  $  T.appendFile  fp st
 
 instance FileOps2 FilePath L.ByteString where
 
     readFile2 fp = callIO $  L.readFile fp
-
     writeFile2  fp st = callIO $  L.writeFile fp st
+    appendFile2  fp st = callIO  $  L.appendFile  fp st
 
 instance FileOps2 (Path ar File) L.ByteString where
 
     readFile2 fp = callIO $  L.readFile . unL $ fp
-
     writeFile2  fp st = callIO $  L.writeFile (unL fp) st
+    appendFile2  fp st = callIO  $  L.appendFile  (unL fp) st
 
 --------------------------test with path
 

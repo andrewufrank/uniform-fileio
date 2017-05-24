@@ -40,6 +40,8 @@ class TypedFiles5 a b where
     write6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
+    append6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
+    -- append to the file, with the same methods as in write6
     read6 ::   Path Abs File -> TypedFile5 a b ->   ErrIO a
 
 
@@ -58,6 +60,11 @@ class TypedFiles5 a b where
 instance TypedFiles5 [Text] () where
     -- file contains a list of lines (text)
     mkTypedFile5  = TypedFile5 { tpext5 = Extension "txt"}
+    write5 fp fn tp  ct = do
+        dirx <- ensureDir fp
+        let fn2 = fn <.> tpext5 tp -- :: Path ar File
+        writeFile2 (fp </> fn2 ) (unlines' ct)
+--      writeFile2 (fp </> (fn <.> (tpext tp) )) . unlines'
     write5 fp fn tp  ct = do
         dirx <- ensureDir fp
         let fn2 = fn <.> tpext5 tp -- :: Path ar File
