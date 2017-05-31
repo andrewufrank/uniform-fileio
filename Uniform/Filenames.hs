@@ -96,19 +96,16 @@ instance ConcatFile (Path b t) where
   type CFFilePath (Path b t) = Path b File
   dirPlusFile dir file =  dir P.</> (P.filename file)
 
-cf1 = "afile" :: FilePath
-cf0 = "" :: FilePath  -- not legal?
 cf2 = "afile.ext" :: FilePath
 cf3 = "/somedir/more/afile.ext"  :: FilePath
 cd1 = "/somedir/more"  :: FilePath
-cg1 = makeRelFile "afile"
---g0 = ""  -- not legal?
+
 cg2 = makeRelFile "afile.ext"
 cg3 = makeAbsFile "/somedir/more/afile.ext"
 cg4 = makeAbsFile "/somedir/more/"
 
---test_CFD1 = assertEqual cf3 (dirPlusFile  cd1 cf2)
---test_CFD2 = assertEqual cg3 (dirPlusFile  cg4 cg2)
+test_CFD1 = assertEqual cf3 (dirPlusFile  cd1 cf2)
+test_CFD2 = assertEqual cg3 (dirPlusFile  cg4 cg2)
 
   -------------
 class Filenames fp fr where
@@ -244,8 +241,8 @@ test_addExt_P = assertEqual (Just g2) $  addExtension e1 g1
 test_removeExt_P = assertEqual g1 (removeExtension g2)
 test_setExt_P = assertEqual (Just g4) (setExtension (Extension "txt") g3)
 
-test_CFD2 = assertEqual g3 (g4d </> g2)
-test_CFD3 = assertEqual g3 (g4d </> f2)  -- mix!
+test_xCFD2 = assertEqual g3 (g4d </> g2)
+test_xCFD3 = assertEqual g3 (g4d </> f2)  -- mix!
 
 --instance Arbitrary (Path Rel File) where
 --    arbitrary = do
