@@ -20,6 +20,8 @@
 {-# LANGUAGE OverloadedStrings     #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 module Uniform.Filenames  (
          module Uniform.Filenames
          , module Path
@@ -47,6 +49,11 @@ import  qualified         System.FilePath.Posix       as S -- prefered
 import Test.Framework
 -- import Test.Invariant
 
+import Path (Path, Abs, Rel, File, Dir)
+import System.FilePath (FilePath)
+import qualified Path as P
+import qualified System.FilePath as FP
+
 
 makeRelFile :: FilePath -> Path Rel File
 makeRelDir :: FilePath -> Path Rel Dir
@@ -68,6 +75,42 @@ instance CharChains2 (Path a d) Text where show'  = s2t . show
 newtype Extension = Extension FilePath deriving (Show, Read, Eq, Ord)
 unExtension (Extension e) = e
 
+
+-- alternative with single parameter
+
+class ConcatFile p where
+  type CFDir p :: *
+  type CFFileName p :: *
+  type CFFilePath p :: *
+  dirPlusFile :: CFDir p -> CFFileName p -> CFFilePath p
+
+instance ConcatFile FilePath where
+  type CFDir FilePath = FilePath
+  type CFFileName FilePath = FilePath
+  type CFFilePath FilePath = FilePath
+  dirPlusFile dir file = (FP.dropFileName dir) FP.</> (FP.takeFileName file)
+
+instance ConcatFile (Path b t) where
+  type CFDir (Path b t) = Path b Dir
+  type CFFileName (Path b t) = Path Rel File
+  type CFFilePath (Path b t) = Path b File
+  dirPlusFile dir file =  dir P.</> (P.filename file)
+
+cf1 = "afile" :: FilePath
+cf0 = "" :: FilePath  -- not legal?
+cf2 = "afile.ext" :: FilePath
+cf3 = "/somedir/more/afile.ext"  :: FilePath
+cd1 = "/somedir/more"  :: FilePath
+cg1 = makeRelFile "afile"
+--g0 = ""  -- not legal?
+cg2 = makeRelFile "afile.ext"
+cg3 = makeAbsFile "/somedir/more/afile.ext"
+cg4 = makeAbsFile "/somedir/more/"
+
+--test_CFD1 = assertEqual cf3 (dirPlusFile  cd1 cf2)
+--test_CFD2 = assertEqual cg3 (dirPlusFile  cg4 cg2)
+
+  -------------
 class Filenames fp fr where
     getFileName :: fp -> fr
 class Filenames3 fp file  where
@@ -166,6 +209,7 @@ f1 = "afile" :: FilePath
 f0 = "" :: FilePath  -- not legal?
 f2 = "afile.ext" :: FilePath
 f3 = "/somedir/more/afile.ext"  :: FilePath
+d1 = "/somedir/more/"  :: FilePath
 test_emptyExt = assertEqual "" (getExtension f1)
 test_emptyExt0 = assertEqual "" (getExtension f0)
 test_getExt = assertEqual "ext" (getExtension f2)
@@ -174,6 +218,8 @@ test_hasExt2 = assertBool $  hasExtension "ext" f3
 test_addExt = assertEqual (Just f2) $  addExtension "ext" f1
 test_removeExt = assertEqual f1 (removeExtension f2)
 test_setExt = assertEqual (Just "afile.txt") (setExtension "txt" f2)
+
+test_xCFD1 = assertEqual cf3 (d1 </>  f2)
 
 --prop_add_has_FP :: FilePath -> FilePath -> Bool
 --prop_add_has_FP e f = if (isInfixOf' "." e) then True else prop_add_has e f
@@ -187,6 +233,7 @@ g1 = makeRelFile "afile"
 g2 = makeRelFile "afile.ext"
 g3 = makeAbsFile "/somedir/more/afile.ext"
 g4 = makeAbsFile "/somedir/more/afile.txt"
+g4d = makeAbsDir "/somedir/more"
 e1 = (Extension "ext")
 test_emptyExt_P = assertEqual (Extension "") (getExtension g1)
 --test_emptyExt0 = assertEqual "" (getExtension f0)
@@ -196,6 +243,9 @@ test_hasExt2_P = assertBool $  hasExtension e1 g2
 test_addExt_P = assertEqual (Just g2) $  addExtension e1 g1
 test_removeExt_P = assertEqual g1 (removeExtension g2)
 test_setExt_P = assertEqual (Just g4) (setExtension (Extension "txt") g3)
+
+test_CFD2 = assertEqual g3 (g4d </> g2)
+test_CFD3 = assertEqual g3 (g4d </> f2)  -- mix!
 
 --instance Arbitrary (Path Rel File) where
 --    arbitrary = do
