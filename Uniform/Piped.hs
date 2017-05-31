@@ -69,22 +69,22 @@ getRecursiveContents  fp = do
                     return ()--    where processOneFile fp = Pipe.yield fp
 
 
-test_recursive = do
-    let testdir = makeRelDir "testDirFileIO"
-    let resfileN = makeRelFile "testDirResN"
-    let resfile0 = makeRelFile "testDirRes0"
-    testdir2 <- makeAbsolute testdir
-    runErr $ do
-        hand <-   openFile2handle resfileN WriteMode
-        Pipe.runEffect $
-            getRecursiveContents testdir2
-            >-> PipePrelude.map  toFilePath
-    ----    >-> P.stdoutLn
-            >-> PipePrelude.toHandle hand
-        closeFile2 hand
-    res0  ::Text <-  readFile5  resfile0
-    resN :: Text <-  readFile5 resfileN
-    assertEqual res0 resN
+--test_recursive = do
+--    let testdir = makeRelDir "testDirFileIO"
+--    let resfileN = makeRelFile "testDirResN"
+--    let resfile0 = makeRelFile "testDirRes0"
+--    testdir2 <- makeAbsolute testdir
+--    runErr $ do
+--        hand <-   openFile2handle resfileN WriteMode
+--        Pipe.runEffect $
+--            getRecursiveContents testdir2
+--            >-> PipePrelude.map  toFilePath
+--    ----    >-> P.stdoutLn
+--            >-> PipePrelude.toHandle hand
+--        closeFile2 hand
+--    res0  ::Text <-  readFile5  resfile0
+--    resN :: Text <-  readFile5 resfileN
+--    assertEqual res0 resN
 
 
 --readFile5 :: Path ar File -> IO Text

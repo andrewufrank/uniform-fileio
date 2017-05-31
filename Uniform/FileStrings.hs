@@ -459,7 +459,7 @@ test_md5_nonReadable = do
 
 corruptJPG = "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG" ::FilePath
 
-test_fail = assertEqual "Fail intentionally just to insure that tests are run"(""::Text)
+--test_fail = assertEqual "Fail intentionally just to insure that tests are run"(""::Text)
 -- readable on santafe but not oporto
 --test_md5_nonReadable2 :: IO ()
 --test_md5_nonReadable2 = do
