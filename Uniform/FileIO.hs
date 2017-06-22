@@ -49,8 +49,10 @@ import           Test.Framework
 import           Test.Invariant
 
 
-instance CharChains2 FilePath Text where
-    show' = s2t
+--instance CharChains2 FilePath Text where
+--    show' = s2t
+-- now in stringUtilities
+
 
 
 --import           Control.Arrow         (first, second)
