@@ -46,6 +46,8 @@ class TypedFiles5 a b where
     append6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
     -- append to the file, with the same methods as in write6
     read6 ::   Path Abs File -> TypedFile5 a b ->   ErrIO a
+    exist6 :: Path Abs File -> TypedFile5 a b ->   ErrIO Bool
+    -- ^ check whether file exist
 
 
 -- generic instance is not possible becuase
