@@ -38,7 +38,7 @@ import qualified System.Directory as D
 ---- using uniform:
 import           Uniform.Error --hiding ((<.>), (</>))
 import           Uniform.Zero
---import           Uniform.FilenamesAlgebra
+import           Uniform.Filenames
 import System.IO (Handle, IOMode (..) )
 
 class FileHandles t where
@@ -136,7 +136,7 @@ class FileOps fp   where
 --
 ---- | the operations on files with content
 --
-class (FileOps fp, Show fp) =>
+class (Show fp) =>
     FileOps2 fp fc where
 --
     writeFile2 :: fp -> fc -> ErrIO ()
@@ -155,18 +155,21 @@ class (FileOps fp, Show fp) =>
 --    writeFileCreateDir :: fp -> fp -> fc ->  ErrIO ()
 --    -- | create file in existing dir
 --
---    writeFileOrCreate :: fp -> fc -> ErrIO ()
---   -- | write or create a file
---   -- if create dir if not exist (recursively for path)
+    writeFileOrCreate2 :: fp -> fc -> ErrIO ()
+   -- | write or create a file
+   -- if create dir if not exist (recursively for path)
+   -- cannot be instantiated in the abstract
+   -- because the getImmedateParentDir returns FilePath
 --    writeFileOrCreate filepath st = do
---        let (dir, fn, ext) = splitFilepath filepath
+--        let dir = getImmediateParentDir filepath
+----        let (dir, fn, ext) = splitFilepath filepath
 --        --        writeFileCreateDir dir fn st
 --        --                  writeFileCreateDir dirpath filename st = do
 ----        let fp = dirpath `combine` filename
---        d <- doesDirExist dir
+--        d <- doesDirExist' dir
 --        --        f <- doesFileExist fp --
 --        unless d $
---                createDirIfMissing dir
+--                createDirIfMissing' dir
 --        writeFile2 filepath st
 
 --

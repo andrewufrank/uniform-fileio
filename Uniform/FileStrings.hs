@@ -351,6 +351,18 @@ instance   FileOps2 (Path ar File) Text where
     writeFile2  fp st = writeFile2 (unL fp) st
     appendFile2  fp st = appendFile2  (unL fp) st
 
+    writeFileOrCreate2 filepath st = do
+        let dir = getImmediateParentDir filepath
+--        let (dir, fn, ext) = splitFilepath filepath
+        --        writeFileCreateDir dir fn st
+        --                  writeFileCreateDir dirpath filename st = do
+--        let fp = dirpath `combine` filename
+        d <- doesDirExist' dir
+        --        f <- doesFileExist fp --
+        unless d $
+                createDirIfMissing' dir
+        writeFile2 filepath st
+
 instance FileOps2 FilePath Text where
 
     readFile2 fp = callIO $  T.readFile fp
