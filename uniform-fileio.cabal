@@ -24,6 +24,7 @@ library
             directory ,
             filepath -any,
             posix-paths -any,
+--            system-filepath,  -- differen def of FilePath
             pureMD5 -any,
             deepseq,
 --            MissingH, or cryptonite...

@@ -78,6 +78,32 @@ instance TypedFiles5 [Text] () where
         let fn2 = fn <.> tpext5 tp
         fmap lines' . readFile2 $ fp </> fn2
 
+    append6 fn tp ct = do
+        let fn2 = fromJustNote "typedfile textLinesFile append6"
+                    . setExtension (tpext5 tp) $ fn
+        appendFile2 fn2 (unlines' ct)
+    write6 fn tp ct = do
+        let fn2 = fromJustNote "typedfile textLinesFile write6"
+                    . setExtension (tpext5 tp) $ fn
+        hand <- openFile2handle fn2 WriteMode
+--        when rdfGraphDebug $ putIOwords ["triples write6", showT fn2]
+
+        write2handle  hand (unlines'   ct)
+
+--        when rdfGraphDebug $ putIOwords ["triples write6", showT fn2]
+        closeFile2  hand
+--        when rdfGraphDebug $ putIOwords ["triples write6", showT fn2]
+
+    exist6 fn tp = do
+        let fn2 = fromJustNote "typedfile textLinesFile write6"
+                . setExtension (tpext5 tp) $ fn
+        doesFileExist'  fn2
+
+    read6 fn tp = do
+        let fn2 = fromJustNote "typedfile textLinesFile read6"
+                . setExtension (tpext5 tp) $ fn
+        fmap lines' . readFile2 $ fn2
+
 textLinesFile = mkTypedFile5  ::TypedFile5 [Text] ()
 dir1 = makeAbsDir "/home/frank/"
 file1 = makeRelFile "aaa"

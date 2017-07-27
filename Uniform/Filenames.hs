@@ -43,6 +43,8 @@ import qualified Path   ((</>))
 import Path.IO
 import  qualified         System.FilePath       as S -- prefered
 import  qualified         System.FilePath.Posix       as S -- prefered
+--import  qualified         Filesystem.Path       as F -- prefered
+-- not usable, has a different definition of FilePath
 
 import Test.Framework
 -- import Test.Invariant
@@ -78,6 +80,8 @@ class Filenames3 fp file  where
 class Filenames1 fp where
     -- instantiate only for filepath
     getImmediateParentDir :: fp -> FilePath
+    -- ^ gets the name of the dir immediately above
+    getParentDir :: fp -> FilePath
     -- ^ the parent dir of file
     getNakedFileName :: fp -> FilePath
     -- ^ filename without extension
@@ -103,10 +107,12 @@ instance Filenames3 (Path b Dir) (Path Rel t)  where
 instance Filenames1 (Path ar File)   where
     getNakedFileName =   getNakedFileName . toFilePath
     getImmediateParentDir = getImmediateParentDir . toFilePath
+    getParentDir =  getParentDir . toFilePath
 
 instance Filenames1 FilePath   where
     getNakedFileName =   removeExtension . getFileName
     getImmediateParentDir = (!! 1) . reverse . S.splitDirectories
+    getParentDir = S.takeDirectory
 
 testname = "/home/frank/dir1/file.ext" :: FilePath
 test_immediateParent = assertEqual "dir1" (getImmediateParentDir testname)

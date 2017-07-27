@@ -106,6 +106,10 @@ instance FileSystemOps FilePath where
 
 instance DirOps FilePath where
     doesDirExist' = callIO . D.doesDirectoryExist
+    createDirIfMissing' = callIO . D.createDirectoryIfMissing True
+    -- creates recusrively up
+
+    createDir' = callIO . D.createDirectory
     renameDir' old new = do
         putIOwords ["renamed start"]
         testSource <-  doesDirExist' old
@@ -335,6 +339,7 @@ readFileT fp = callIO .  T.readFile . unL $ fp
 
 writeFileT :: Path ar File  -> Text -> ErrIO ()
 writeFileT  fp st = callIO $  T.writeFile (unL fp) st
+-- attention - does not create file if not existing
 
 instance   FileOps2 (Path ar File) String where
 
@@ -352,16 +357,20 @@ instance   FileOps2 (Path ar File) Text where
     appendFile2  fp st = appendFile2  (unL fp) st
 
     writeFileOrCreate2 filepath st = do
-        let dir = getImmediateParentDir filepath
+        let dir = getParentDir filepath
 --        let (dir, fn, ext) = splitFilepath filepath
         --        writeFileCreateDir dir fn st
         --                  writeFileCreateDir dirpath filename st = do
 --        let fp = dirpath `combine` filename
-        d <- doesDirExist' dir
-        --        f <- doesFileExist fp --
-        unless d $
-                createDirIfMissing' dir
+--        d <- doesDirExist' dir
+--        --        f <- doesFileExist fp --
+--        unless d $
+        createDirIfMissing' dir
+        putIOwords ["writeFileOrCreate2 dir created", showT dir]
+        t <- doesDirExist' dir
+        putIOwords ["writeFileOrCreate2 dir test", showT t]
         writeFile2 filepath st
+        putIOwords ["writeFileOrCreate2 dir written"]
 
 instance FileOps2 FilePath Text where
 
@@ -421,84 +430,91 @@ test_call_procp = do
     assertBool (isLeft res)
 --    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
 
-test_md5_nonReadablep = do
-    res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 procFile
-    putIOwords ["test_md5_nonReadable res", showT res]
-    assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
-
-
-------------old test with filepath
-
-
-test_catch_error2 = do
-    res <- runErr $ do
-                            f :: Text <-  readFile2 ("xxxabcd" :: FilePath)
-                            return False
-                `catchError `
-                            \(e::Text) ->  return True
-    assertEqual (Right True) res
-
-test_call_IO = do
-    res <- runErr $ do
-        f :: String <-   callIO $ readFile "xxxabcd17"  -- not existing fileAccess
-        return False   -- expect that read fials
-    assertEqual ( Left "xxxabcd17: openFile: does not exist (No such file or directory)") res
-
-test_call_IO_L = do
-    res <- runErr $ do
-        f :: L.ByteString <-   callIO $ L.readFile "xxxabcd17"  -- not existing fileAccess
-        return False   -- expect that read fials
-    assertEqual ( Left "xxxabcd17: openBinaryFile: does not exist (No such file or directory)") res
-
---test_call_IO_Corrupt= do
---    res <- runErr $ callIO $ do
---        f :: L.ByteString <-    L.readFile corruptJPG  -- not existing fileAccess
---        putIOwords ["call_IO_Corrupt", showT . L.length $ f]  -- just to enforce strictness
+test_createNewDirFile = do
+    let fn = makeAbsFile "/home/frank/test/1.test"
+    r <- runErr $ writeFileOrCreate2 fn ("testtext"::Text)
+    assertEqual (Right () ) r
+--
+--test_md5_nonReadablep = do
+--    res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 procFile
+--    putIOwords ["test_md5_nonReadable res", showT res]
+--    assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
+--
+--
+--------------old test with filepath
+--
+--
+--test_catch_error2 = do
+--    res <- runErr $ do
+--                            f :: Text <-  readFile2 ("xxxabcd" :: FilePath)
+--                            return False
+--                `catchError `
+--                            \(e::Text) ->  return True
+--    assertEqual (Right True) res
+--
+--test_call_IO = do
+--    res <- runErr $ do
+--        f :: String <-   callIO $ readFile "xxxabcd17"  -- not existing fileAccess
 --        return False   -- expect that read fials
---    assertEqual ( Left "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG: \
---        \hGetBufSome: hardware fault (Input/output error)") res
-
-test_call_proc = do
-    res <- runErr $ do
-        f   <-   callIO $ L.readFile "/proc/1/task/1/maps"  -- not existing fileAccess
-        return False   -- expect that read fials
-    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
-
-test_md5_nonReadable = do
-    res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 ("/proc/1/task/1/maps" ::FilePath)
-    putIOwords ["test_md5_nonReadable res", showT res]
-    assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
-
-corruptJPG = "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG" ::FilePath
-
---test_fail = assertEqual "Fail intentionally just to insure that tests are run"(""::Text)
--- readable on santafe but not oporto
---test_md5_nonReadable2 :: IO ()
---test_md5_nonReadable2 = do
---        res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5  corruptJPG
---        putIOwords ["test_md5_nonReadable corrupt jpg file", showT res]
---        -- does not catch the error?
---        assertEqual (Left "getMD5 error for \"/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG\"") res
-----   `catch` \(e::SomeException) -> do
-----                putIOwords ["caught with catch in test_md5_nonReadable2 ", showT e]
-----                return ()
-
--- not corrupt on santa fe, but on oporto
---test_md5_catch :: IO ()
---test_md5_catch = do
---        res3 :: ErrOrVal ByteString <- runErr $ callIO $ do
---                        res1 :: L.ByteString <-    L.readFile  corruptJPG
---                        let res2 = L.toStrict  res1
---                        return $!! res2
---        assertEqual (Left "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG: hGetBufSome: hardware fault (Input/output error)") res3
-----   `catch` \(e::SomeException) -> do
-----                putIOwords ["caught with catch in test_md5_catch ", showT e]
-----                return ()
-
-test_symlink :: IO ()
-test_symlink = do
-    let t =   makeAbsFile "/bin/X11/X11"
-    isSymlink1 <- D.pathIsSymbolicLink   (OS.dropTrailingPathSeparator $ toFilePath t)
-    isSymlink2 <- D.pathIsSymbolicLink "/bin/X11/X11" -- (toFilePath t)
-    isSymlink3 <- D.pathIsSymbolicLink "/bin/X11/X11/" -- (toFilePath t)
-    assertEqual  (True, True, False) (isSymlink1, isSymlink2, isSymlink3)
+--    assertEqual ( Left "xxxabcd17: openFile: does not exist (No such file or directory)") res
+--
+--test_call_IO_L = do
+--    res <- runErr $ do
+--        f :: L.ByteString <-   callIO $ L.readFile "xxxabcd17"  -- not existing fileAccess
+--        return False   -- expect that read fials
+--    assertEqual ( Left "xxxabcd17: openBinaryFile: does not exist (No such file or directory)") res
+--
+----test_call_IO_Corrupt= do
+----    res <- runErr $ callIO $ do
+----        f :: L.ByteString <-    L.readFile corruptJPG  -- not existing fileAccess
+----        putIOwords ["call_IO_Corrupt", showT . L.length $ f]  -- just to enforce strictness
+----        return False   -- expect that read fials
+----    assertEqual ( Left "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG: \
+----        \hGetBufSome: hardware fault (Input/output error)") res
+--
+--test_call_proc = do
+--    res <- runErr $ do
+--        f   <-   callIO $ L.readFile "/proc/1/task/1/maps"  -- not existing fileAccess
+--        return False   -- expect that read fials
+--    assertEqual ( Left "/proc/1/task/1/maps: openBinaryFile: permission denied (Permission denied)") res
+--
+--test_md5_nonReadable = do
+--    res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5 ("/proc/1/task/1/maps" ::FilePath)
+--    putIOwords ["test_md5_nonReadable res", showT res]
+--    assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
+--
+--corruptJPG = "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG" ::FilePath
+--
+----test_fail = assertEqual "Fail intentionally just to insure that tests are run"(""::Text)
+---- readable on santafe but not oporto
+----test_md5_nonReadable2 :: IO ()
+----test_md5_nonReadable2 = do
+----        res :: ErrOrVal (Maybe Text)  <- runErr $ getMD5  corruptJPG
+----        putIOwords ["test_md5_nonReadable corrupt jpg file", showT res]
+----        -- does not catch the error?
+----        assertEqual (Left "getMD5 error for \"/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG\"") res
+------   `catch` \(e::SomeException) -> do
+------                putIOwords ["caught with catch in test_md5_nonReadable2 ", showT e]
+------                return ()
+--
+---- not corrupt on santa fe, but on oporto
+----test_md5_catch :: IO ()
+----test_md5_catch = do
+----        res3 :: ErrOrVal ByteString <- runErr $ callIO $ do
+----                        res1 :: L.ByteString <-    L.readFile  corruptJPG
+----                        let res2 = L.toStrict  res1
+----                        return $!! res2
+----        assertEqual (Left "/home/frank/additionalSpace/Photos_2016/sizilien2016/DSC04129.JPG: hGetBufSome: hardware fault (Input/output error)") res3
+------   `catch` \(e::SomeException) -> do
+------                putIOwords ["caught with catch in test_md5_catch ", showT e]
+------                return ()
+--
+--test_symlink :: IO ()
+--test_symlink = do
+--    let t =   makeAbsFile "/bin/X11/X11"
+--    isSymlink1 <- D.pathIsSymbolicLink   (OS.dropTrailingPathSeparator $ toFilePath t)
+--    isSymlink2 <- D.pathIsSymbolicLink "/bin/X11/X11" -- (toFilePath t)
+--    isSymlink3 <- D.pathIsSymbolicLink "/bin/X11/X11/" -- (toFilePath t)
+--    assertEqual  (True, True, False) (isSymlink1, isSymlink2, isSymlink3)
+--
+--
