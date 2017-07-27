@@ -63,7 +63,10 @@ getRecursiveContents  fp = do
             if symLink
                 then  Pipe.lift $ putIOwords ["recurseDir symlink", showT fp]
                 else do
-                    (dirs, files) <- Pipe.lift   $ listDir  fp
+                    (dirs, files) <- Pipe.lift $ listDir  fp
+                    Pipe.lift $ putIOwords ["recurseDir files\n", showT files]
+                    Pipe.lift $ putIOwords ["recurseDir directories\n", showT dirs]
+
                     Prelude.mapM_ (Pipe.yield) (sort files)
                     Prelude.mapM_ (getRecursiveContents) (sort dirs)
                     return ()--    where processOneFile fp = Pipe.yield fp
