@@ -70,12 +70,16 @@ instance CharChains2 (Path a d) Text where show'  = s2t . show
 newtype Extension = Extension FilePath deriving (Show, Read, Eq, Ord)
 unExtension (Extension e) = e
 
+makeExtension = Extension
+-- would need a makeExtension in IO to catch errors here
+
 class Filenames fp fr where
     getFileName :: fp -> fr
 class Filenames3 fp file  where
     type FileResultT fp file
     -- add a filepath to a absolute dir and givev an absolte file
-    (</>)  :: fp -> file -> FileResultT fp file
+    (</>), addFileName  :: fp -> file -> FileResultT fp file
+    (</>) = addFileName
 
 class Filenames1 fp where
     -- instantiate only for filepath
@@ -90,19 +94,19 @@ instance Filenames FilePath FilePath where
     getFileName = snd . S.splitFileName
 instance Filenames3 FilePath FilePath  where
     type FileResultT FilePath FilePath = FilePath
-    p </>  d  = S.combine p d
+    addFileName p  d  = S.combine p d
 
 instance Filenames (Path ar File) (Path Rel File) where
     getFileName = filename
 
 instance Filenames3 (Path b Dir) FilePath  where
     type FileResultT (Path b Dir) FilePath = (Path b File)
-    p </> d =  (Path.</>) p d2
+    addFileName p  d =  (Path.</>) p d2
         where
             d2 = makeRelFile d :: Path Rel File
 instance Filenames3 (Path b Dir) (Path Rel t)  where
     type FileResultT (Path b Dir) (Path Rel t) = (Path b t)
-    p </> d =  (Path.</>) p d
+    addFileName p  d =  (Path.</>) p d
 
 instance Filenames1 (Path ar File)   where
     getNakedFileName =   getNakedFileName . toFilePath
@@ -127,27 +131,27 @@ class (Eq (ExtensionType fp)) => Extensions fp where
     type ExtensionType fp
     getExtension :: fp -> ExtensionType fp
     removeExtension :: fp -> fp
-    addExtension :: ExtensionType fp -> fp -> Maybe fp
+    addExtension :: ExtensionType fp -> fp -> fp
     -- must not have an extension before
     (<.>) :: fp -> ExtensionType fp -> fp  -- eror when not legal?
-    (<.>) f e = fromJustNote "addExtension was not legal" $ addExtension e f
-    setExtension :: ExtensionType fp -> fp -> Maybe fp
+    (<.>) f e =  addExtension e f
+    setExtension :: ExtensionType fp -> fp -> fp
     hasExtension :: ExtensionType fp -> fp -> Bool
     hasExtension e = (e ==) . getExtension
 
     prop_add_has :: ExtensionType fp -> fp -> Bool
-    prop_add_has e f = maybe True (hasExtension e) (addExtension e f)
+    prop_add_has e f =  (hasExtension e) (addExtension e f)
     prop_add_add_has :: ExtensionType fp -> ExtensionType fp -> fp -> Bool
-    prop_add_add_has e1 e2 f =  maybe True (hasExtension e1)
-               (maybe Nothing (setExtension e1) . setExtension e2 $ f)
+    prop_add_add_has e1 e2 f = (hasExtension e1)
+               ( (setExtension e1) . setExtension e2 $ f)
     prop_set_get :: ExtensionType fp -> fp -> Bool
-    prop_set_get e f = maybe True ((e==) . getExtension) (setExtension e f)
+    prop_set_get e f =  ((e==) . getExtension)  (setExtension e f)
 
 instance Extensions FilePath  where
     type ExtensionType FilePath = FilePath
 
     getExtension = removeChar '.' . snd . S.splitExtension
-    addExtension e fp = Just $ fp S.<.> e
+    addExtension e fp =  fp S.<.> e
     removeExtension  = fst . S.splitExtension
     setExtension e  = addExtension e . removeExtension
 --    hasExtension e = (e ==) . getExtension
@@ -156,9 +160,9 @@ instance Extensions (Path ar File) where
     type ExtensionType (Path ar File) = Extension
 
     getExtension f = Extension . removeChar '.' . Path.fileExtension $ f
-    setExtension e = Path.setFileExtension (unExtension e)
-    addExtension e f  = Path.setFileExtension (unExtension e) f
-    removeExtension   = fromJustNote "removeExtension" . setExtension (Extension "")
+    setExtension e = fromJustNote "setExtension" . Path.setFileExtension (unExtension e)
+    addExtension e   =  setExtension ( e)
+    removeExtension   =  setExtension (Extension "")
 --    hasExtension e f = (e==). getExtension
 
 --instance AnyPath FilePath where
@@ -167,7 +171,8 @@ instance Extensions (Path ar File) where
 --            return $ AbsPath (makeAbsFile "testesss")
 ------------------tests
 
--- rigerous filepath testing is difficult, as many inputs are not leading to leagal path
+-- rigerous filepath testing is difficult,
+-- as many inputs are not leading to leagal path
 f1 = "afile" :: FilePath
 f0 = "" :: FilePath  -- not legal?
 f2 = "afile.ext" :: FilePath
@@ -177,9 +182,9 @@ test_emptyExt0 = assertEqual "" (getExtension f0)
 test_getExt = assertEqual "ext" (getExtension f2)
 test_hasExt = assertBool $  hasExtension "ext" f2
 test_hasExt2 = assertBool $  hasExtension "ext" f3
-test_addExt = assertEqual (Just f2) $  addExtension "ext" f1
+test_addExt = assertEqual ( f2) $  addExtension "ext" f1
 test_removeExt = assertEqual f1 (removeExtension f2)
-test_setExt = assertEqual (Just "afile.txt") (setExtension "txt" f2)
+test_setExt = assertEqual ( "afile.txt") (setExtension "txt" f2)
 
 --prop_add_has_FP :: FilePath -> FilePath -> Bool
 --prop_add_has_FP e f = if (isInfixOf' "." e) then True else prop_add_has e f
@@ -199,9 +204,9 @@ test_emptyExt_P = assertEqual (Extension "") (getExtension g1)
 test_getExt_P = assertEqual e1 (getExtension g2)
 test_hasExt_P = assertBool $  hasExtension e1 g2
 test_hasExt2_P = assertBool $  hasExtension e1 g2
-test_addExt_P = assertEqual (Just g2) $  addExtension e1 g1
+test_addExt_P = assertEqual ( g2) $  addExtension e1 g1
 test_removeExt_P = assertEqual g1 (removeExtension g2)
-test_setExt_P = assertEqual (Just g4) (setExtension (Extension "txt") g3)
+test_setExt_P = assertEqual ( g4) (setExtension (Extension "txt") g3)
 
 --instance Arbitrary (Path Rel File) where
 --    arbitrary = do

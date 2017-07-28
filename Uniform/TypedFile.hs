@@ -79,12 +79,10 @@ instance TypedFiles5 [Text] () where
         fmap lines' . readFile2 $ fp </> fn2
 
     append6 fn tp ct = do
-        let fn2 = fromJustNote "typedfile textLinesFile append6"
-                    . setExtension (tpext5 tp) $ fn
+        let fn2 =   setExtension (tpext5 tp) $ fn
         appendFile2 fn2 (unlines' ct)
     write6 fn tp ct = do
-        let fn2 = fromJustNote "typedfile textLinesFile write6"
-                    . setExtension (tpext5 tp) $ fn
+        let fn2 =   setExtension (tpext5 tp) $ fn
         hand <- openFile2handle fn2 WriteMode
 --        when rdfGraphDebug $ putIOwords ["triples write6", showT fn2]
 
@@ -95,13 +93,11 @@ instance TypedFiles5 [Text] () where
 --        when rdfGraphDebug $ putIOwords ["triples write6", showT fn2]
 
     exist6 fn tp = do
-        let fn2 = fromJustNote "typedfile textLinesFile write6"
-                . setExtension (tpext5 tp) $ fn
+        let fn2 =  setExtension (tpext5 tp) $ fn
         doesFileExist'  fn2
 
     read6 fn tp = do
-        let fn2 = fromJustNote "typedfile textLinesFile read6"
-                . setExtension (tpext5 tp) $ fn
+        let fn2 =  setExtension (tpext5 tp) $ fn
         fmap lines' . readFile2 $ fn2
 
 textLinesFile = mkTypedFile5  ::TypedFile5 [Text] ()
