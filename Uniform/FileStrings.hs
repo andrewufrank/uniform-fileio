@@ -366,11 +366,11 @@ instance   FileOps2 (Path ar File) Text where
 --        --        f <- doesFileExist fp --
 --        unless d $
         createDirIfMissing' dir
-        putIOwords ["writeFileOrCreate2 dir created", showT dir]
+        when False $ putIOwords ["writeFileOrCreate2 dir created", showT dir]
         t <- doesDirExist' dir
-        putIOwords ["writeFileOrCreate2 dir test", showT t]
+        when False $ putIOwords ["writeFileOrCreate2 dir test", showT t]
         writeFile2 filepath st
-        putIOwords ["writeFileOrCreate2 dir written"]
+        putIOwords ["writeFileOrCreate2 file written", st]
 
 instance FileOps2 FilePath Text where
 
