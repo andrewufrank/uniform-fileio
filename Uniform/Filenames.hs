@@ -78,8 +78,15 @@ class Filenames fp fr where
 class Filenames3 fp file  where
     type FileResultT fp file
     -- add a filepath to a absolute dir and givev an absolte file
-    (</>), addFileName  :: fp -> file -> FileResultT fp file
+    --
+    (</>), addFileName :: fp -> file -> FileResultT fp file
     (</>) = addFileName
+
+class Filenames4 fp file  where
+    type FileResultT4 fp file
+    -- add a filepath to a absolute dir and givev an absolte dir
+    --
+    addDir  :: fp -> file -> FileResultT4 fp file
 
 class Filenames1 fp where
     -- instantiate only for filepath
@@ -104,6 +111,11 @@ instance Filenames3 (Path b Dir) FilePath  where
     addFileName p  d =  (Path.</>) p d2
         where
             d2 = makeRelFile d :: Path Rel File
+instance Filenames4 (Path b Dir) FilePath  where
+    type FileResultT4 (Path b Dir) FilePath = (Path b Dir)
+    addDir p  d =  (Path.</>) p d2
+        where
+            d2 = makeRelDir d :: Path Rel Dir
 instance Filenames3 (Path b Dir) (Path Rel t)  where
     type FileResultT (Path b Dir) (Path Rel t) = (Path b t)
     addFileName p  d =  (Path.</>) p d
