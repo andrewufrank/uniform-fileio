@@ -24,6 +24,7 @@ module Uniform.Filenames  (
          module Uniform.Filenames
          , module Path
          , module Uniform.Error
+--         , makeExtension, unExtension
         --  , module Uniform.Strings
 --          , htf_thisModulesTests
              ) where
