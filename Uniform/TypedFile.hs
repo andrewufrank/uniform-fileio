@@ -17,7 +17,7 @@ module Uniform.TypedFile (
 import Test.Framework
 
 --import           Uniform.Error
---import           Uniform.FileIOalgebra
+import           Uniform.FileIOalgebra (Handle)
 import           Uniform.Filenames
 import           Uniform.FileStrings
 
@@ -41,6 +41,12 @@ class TypedFiles5 a b where
     read5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b ->   ErrIO a
 
     write6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
+    -- write a file, directory is created if not exist
+    -- file, if exist, is replaced
+
+    openHandle6 ::  Path Abs File -> TypedFile5 a b -> ErrIO Handle
+    -- | create the file and open the handle
+    writeHandle6 ::   Handle -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
     append6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()

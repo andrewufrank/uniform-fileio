@@ -26,6 +26,7 @@ module Uniform.FileIO (
          , module Uniform.TypedFile
          , module Uniform.FileStrings
          , module Uniform.Piped
+--         , Handle, IOMode (..)
             ) where
 
 --import qualified Data.Text as T

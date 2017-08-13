@@ -28,6 +28,7 @@ module Uniform.FileIOalgebra (
         module Uniform.FileIOalgebra
          , module Uniform.Error
          , module Uniform.Zero
+         , module System.IO
             ) where
 
 

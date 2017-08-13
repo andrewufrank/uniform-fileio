@@ -268,7 +268,11 @@ instance FileOps FilePath  where
 
 
 
-    openFile2handle fp mode = callIO $ SIO.openFile fp mode
+    openFile2handle fp mode = do
+            callIO $ SIO.openFile fp mode
+--        `catchError` \e -> do
+        -- most likely the dir does not exist.
+        -- try to create the file?
 --    closeFile _ handle = callIO $ SIO.hClose handle
 
 --unL = t2s . filepath2text lpX
