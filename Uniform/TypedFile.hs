@@ -46,9 +46,14 @@ class TypedFiles5 a b where
 
     openHandle6 ::  Path Abs File -> TypedFile5 a b -> ErrIO Handle
     -- | create the file and open the handle
+    -- should attache ".tmp" to extension and when closing
+    -- rename to correct filename - > transaction completed
     writeHandle6 ::   Handle -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
+    closeHandle6 :: Path Abs File ->TypedFile5 a b -> Handle -> ErrIO ()
+    -- | close the handle - with transaction
+    -- change filename from tmp to correct name
     append6 ::   Path Abs File -> TypedFile5 a b -> a -> ErrIO ()
     -- append to the file, with the same methods as in write6
     read6 ::   Path Abs File -> TypedFile5 a b ->   ErrIO a
