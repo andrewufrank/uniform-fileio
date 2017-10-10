@@ -51,6 +51,10 @@ class TypedFiles5 a b where
     writeHandle6 ::   Handle -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
+--    writeHandle6zip ::   Bool -> Handle -> TypedFile5 a b -> a -> ErrIO ()
+--    -- write a file, directory is created if not exist
+--    -- file, if exist, is replaced
+--    -- bool gives a flag to force gzip on input
     closeHandle6 :: Path Abs File ->TypedFile5 a b -> Handle -> ErrIO ()
     -- | close the handle - with transaction
     -- change filename from tmp to correct name

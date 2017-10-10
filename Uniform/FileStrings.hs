@@ -85,6 +85,10 @@ instance FileHandles String where
     write2handle h c = callIO $ SIO.hPutStr h c
     readLine4handle h = callIO $ SIO.hGetLine h
 
+instance FileHandles L.ByteString where
+    write2handle h c = callIO $ L.hPutStr h c
+    readLine4handle h = error "readLine4handle not implemented for lazy bytestring in FileStrings"
+
 instance FileHandles Text where
     write2handle h c = callIO $ TIO.hPutStr h c
     readLine4handle h = callIO $ TIO.hGetLine h
@@ -95,7 +99,7 @@ readFile5 = fmap s2t .readFile . toFilePath
 
 
 listDir' :: (MonadIO m, MonadThrow m)
-  => Path b Dir        -- ^ Directory to list
+  => Path b Dir          -- ^ Directory to list
   -> m ([Path Abs Dir], [Path Abs File]) -- ^ Sub-directories and files
 listDir' = P.listDir
 -- would require a class and an implementation for FilePath
