@@ -97,6 +97,8 @@ class Filenames1 fp where
     -- ^ the parent dir of file
     getNakedFileName :: fp -> FilePath
     -- ^ filename without extension
+    getNakedDir :: fp -> FilePath
+    -- ^ get the last dir
 
 instance Filenames FilePath FilePath where
     getFileName = snd . S.splitFileName
@@ -126,10 +128,14 @@ instance Filenames1 (Path ar File)   where
     getImmediateParentDir = getImmediateParentDir . toFilePath
     getParentDir =  getParentDir . toFilePath
 
+instance Filenames1 (Path ar Dir) where
+    getNakedDir = getNakedDir . toFilePath
+
 instance Filenames1 FilePath   where
     getNakedFileName =   removeExtension . getFileName
     getImmediateParentDir = (!! 1) . reverse . S.splitDirectories
     getParentDir = S.takeDirectory
+    getNakedDir = (!! 0) . reverse . S.splitDirectories
 
 testname = "/home/frank/dir1/file.ext" :: FilePath
 test_immediateParent = assertEqual "dir1" (getImmediateParentDir testname)
@@ -197,7 +203,8 @@ test_hasExt = assertBool $  hasExtension "ext" f2
 test_hasExt2 = assertBool $  hasExtension "ext" f3
 test_addExt = assertEqual ( f2) $  addExtension "ext" f1
 test_removeExt = assertEqual f1 (removeExtension f2)
-test_setExt = assertEqual ( "afile.txt") (setExtension "txt" f2)
+test_setExt = assertEqual ("afile.txt") (setExtension "txt" f2)
+
 
 --prop_add_has_FP :: FilePath -> FilePath -> Bool
 --prop_add_has_FP e f = if (isInfixOf' "." e) then True else prop_add_has e f
@@ -220,6 +227,8 @@ test_hasExt2_P = assertBool $  hasExtension e1 g2
 test_addExt_P = assertEqual ( g2) $  addExtension e1 g1
 test_removeExt_P = assertEqual g1 (removeExtension g2)
 test_setExt_P = assertEqual ( g4) (setExtension (Extension "txt") g3)
+d1 = makeAbsDir "/somedir/more/dir"
+test_nakedDir = assertEqual "dir" (getNakedDir d1)
 
 --instance Arbitrary (Path Rel File) where
 --    arbitrary = do
