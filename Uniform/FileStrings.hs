@@ -270,6 +270,13 @@ instance FileOps FilePath  where
 
         -- fails if broken symbolic link?
 
+    isFileAbeforeB fpa fpb = do
+        statA :: P.FileStatus <- getFileStatus' fpa
+        statB <- getFileStatus' fpb
+        let
+            timea = getModificationTimeFromStatus statA
+            timeb = getModificationTimeFromStatus statB
+        return $ timea < timeb
 
 
     openFile2handle fp mode = do
@@ -321,6 +328,14 @@ instance FileOps (P.Path ar File)  where
 ----        putIOwords ["nonhidden files", show r2]
 --        let r3 = (map (makeLegalPath . s2t) r2)
 --        return (catMaybes r3)
+
+    isFileAbeforeB fpa fpb = do
+        statA :: P.FileStatus <- getFileStatus fpa
+        statB <- getFileStatus fpb
+        let
+            timea = getModificationTimeFromStatus statA
+            timeb = getModificationTimeFromStatus statB
+        return $ timea < timeb
 
     openFile2handle fp mode =  openFile2handle (unL fp) mode
 --    closeFile fp handle = closeFile (unL fp) handle
@@ -449,6 +464,13 @@ test_createNewDirFile = do
 --    assertEqual (Left "getMD5 error for \"/proc/1/task/1/maps\"") res
 --
 --
+test_before = do
+    let fna = makeAbsFile "/home/frank/test/a.test"
+    let fnb = makeAbsFile "/home/frank/test/b.test"
+    r <- runErr $ isFileAbeforeB fna fnb
+    assertEqual (Right True ) r
+
+
 --------------old test with filepath
 --
 --

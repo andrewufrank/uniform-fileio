@@ -36,7 +36,7 @@ module Uniform.FileStatus ( htf_thisModulesTests
 --        , getSymbolicLinkStatusFP
 --        , createSymbolicLink, renameLink
 --        , doesExist
---    ,getModificationTime  -- TODO is this correct export?
+    ,getModificationTimeFromStatus  -- TODO is this correct export?
     , getFileSize
 --        , getSymbolicLinkStatusX
                    ) where
@@ -85,7 +85,7 @@ isDirectory :: P.FileStatus -> Bool
 isDirectory = P.isDirectory
 isSymbolicLink :: P.FileStatus -> Bool
 isSymbolicLink = P.isSymbolicLink
-getModificationTime = P.modificationTime
+getModificationTimeFromStatus = P.modificationTime
 getFileSize = P.fileSize
 
 createSymbolicLink :: Path df ra -> Path df ra-> ErrIO ()

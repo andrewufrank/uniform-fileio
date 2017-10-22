@@ -117,6 +117,9 @@ class FileOps fp   where
     -- ^ check the read, write and execute permission on file
     -- dir get content needs execute,
 
+    isFileAbeforeB :: fp -> fp -> ErrIO Bool
+    -- ^ check if the first file A is touched before file B
+    -- uses modification time
 
 
 -- operations on handle
