@@ -33,9 +33,9 @@ module Uniform.FileIOalgebra (
 
 
 --import qualified Data.Text as T
-import qualified System.Posix  as Posix (FileStatus)
+--import qualified System.Posix  as Posix (FileStatus, Epoch)
 import qualified System.Directory as D
-
+import Uniform.FileStatus (FileStatus, EpochTime)
 ---- using uniform:
 import           Uniform.Error --hiding ((<.>), (</>))
 import           Uniform.Zero
@@ -109,7 +109,7 @@ class FileOps fp   where
     getAppConfigDirectory :: ErrIO fp
     -- ^ find the .config directory path
 
-    getSymbolicLinkStatus :: fp ->   ErrIO ( Posix.FileStatus)
+    getSymbolicLinkStatus :: fp ->   ErrIO FileStatus
     -- ^ get status if exist (else Nothing)
     --   is the status of the link, does not follow the link
 
@@ -117,10 +117,12 @@ class FileOps fp   where
     -- ^ check the read, write and execute permission on file
     -- dir get content needs execute,
 
-    isFileAbeforeB :: fp -> fp -> ErrIO Bool
-    -- ^ check if the first file A is touched before file B
-    -- uses modification time
+--    isFileAbeforeB :: fp -> fp -> ErrIO Bool
+--    -- ^ check if the first file A is touched before file B
+--    -- uses modification time
 
+    getFileModificationTime :: fp -> ErrIO EpochTime
+    -- ^ get the modification time  (replaces isFileAbeforeB)
 
 -- operations on handle
 

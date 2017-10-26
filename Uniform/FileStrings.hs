@@ -270,13 +270,20 @@ instance FileOps FilePath  where
 
         -- fails if broken symbolic link?
 
-    isFileAbeforeB fpa fpb = do
+--    isFileAbeforeB fpa fpb = do
+--        statA :: P.FileStatus <- getFileStatus' fpa
+--        statB <- getFileStatus' fpb
+--        let
+--            timea = getModificationTimeFromStatus statA
+--            timeb = getModificationTimeFromStatus statB
+--        return $ timea < timeb
+
+    getFileModificationTime  fp = do
         statA :: P.FileStatus <- getFileStatus' fpa
-        statB <- getFileStatus' fpb
         let
             timea = getModificationTimeFromStatus statA
-            timeb = getModificationTimeFromStatus statB
-        return $ timea < timeb
+        return timea
+
 
 
     openFile2handle fp mode = do
