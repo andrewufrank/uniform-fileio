@@ -12,6 +12,7 @@ module Uniform.TypedFile (
         module Uniform.TypedFile
 --        , textFile, textsFile
         -- , module Uniform.FileIO
+        , EpochTime
 )  where
 
 import Test.Framework
@@ -20,7 +21,7 @@ import Test.Framework
 import           Uniform.FileIOalgebra (Handle)
 import           Uniform.Filenames
 import           Uniform.FileStrings
-
+import Uniform.FileStatus
 --import           Uniform.Strings hiding ((</>))
 
 
@@ -63,7 +64,7 @@ class TypedFiles5 a b where
     read6 ::   Path Abs File -> TypedFile5 a b ->   ErrIO a
     exist6 :: Path Abs File -> TypedFile5 a b ->   ErrIO Bool
     -- ^ check whether file exist
-
+    modificationTime6 :: Path Abs File -> TypedFile5 a b -> ErrIO EpochTime
 
 -- generic instance is not possible becuase
 -- it is not known whether this is a file to open with filepath or path-io
