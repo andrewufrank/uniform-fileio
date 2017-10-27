@@ -27,6 +27,7 @@ module Uniform.FileIO (
          , module Uniform.FileStrings
          , module Uniform.Piped
 --         , Handle, IOMode (..)
+        , EpochTime
             ) where
 
 --import qualified Data.Text as T
