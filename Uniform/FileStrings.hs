@@ -27,6 +27,7 @@ module Uniform.FileStrings (htf_thisModulesTests
             , closeFile2
             , listDir'
             , readFile5
+            , TIO.hGetLine, TIO.hPutStr  -- for other implementations of FileHandle
 
 --    , readFileT, writeFileT
 
@@ -92,6 +93,12 @@ instance FileHandles L.ByteString where
 instance FileHandles Text where
     write2handle h c = callIO $ TIO.hPutStr h c
     readLine4handle h = callIO $ TIO.hGetLine h
+
+instance FileHandles [Text] where
+    write2handle h c = callIO $ TIO.hPutStr h (unlines' c)
+    readLine4handle h = do
+            res <-  callIO $ TIO.hGetLine h
+            return . lines' $ res
 
 --for testing:
 readFile5 :: Path ar File -> IO Text
