@@ -81,6 +81,7 @@ class Filenames3 fp file  where
     -- add a filepath to a absolute dir and givev an absolte file
     --
     (</>), addFileName :: fp -> file -> FileResultT fp file
+    -- fails, if file is empty  does not add anything if file is empty
     (</>) = addFileName
 
 class Filenames4 fp file  where
@@ -111,14 +112,31 @@ instance Filenames (Path ar File) (Path Rel File) where
 
 instance Filenames3 (Path b Dir) FilePath  where
     type FileResultT (Path b Dir) FilePath = (Path b File)
-    addFileName p  d =  (Path.</>) p d2
+    addFileName p  d =  if null' d then error ("addFileName with empty file" ++ d)
+                                    else (Path.</>) p d2
         where
             d2 = makeRelFile d :: Path Rel File
+
+testdir1 = makeAbsDir "/home/frank/test"
+testfile1 = "file1.x" :: FilePath
+testdir2 = "files" :: FilePath
+test_addFilename = assertEqual "/home/frank/test/file1.x" (toFilePath $ addFileName testdir1 testfile1)
+--test_addFilenameEmpty = assertEqual "" (toFilePath $ addFileName testdir1 (""::FilePath))
+-- does fail
+
+test_addDir = assertEqual "/home/frank/test/files/" (toFilePath $ addDir testdir1 testdir2)
+test_addDirEmpty = assertEqual "/home/frank/test/" (toFilePath $ addDir testdir1 (""::FilePath))
+
+
 instance Filenames4 (Path b Dir) FilePath  where
     type FileResultT4 (Path b Dir) FilePath = (Path b Dir)
-    addDir p  d =  (Path.</>) p d2
+    addDir p  d =  if null' d then p
+                                    else (Path.</>) p d2
         where
             d2 = makeRelDir d :: Path Rel Dir
+--            (Path.</>) p d2
+--        where
+--            d2 = makeRelDir d :: Path Rel Dir
 instance Filenames3 (Path b Dir) (Path Rel t)  where
     type FileResultT (Path b Dir) (Path Rel t) = (Path b t)
     addFileName p  d =  (Path.</>) p d
@@ -142,6 +160,7 @@ test_immediateParent = assertEqual "dir1" (getImmediateParentDir testname)
 test_nakedFilename = assertEqual "file" (getNakedFileName testname)
 
 testname2 = makeAbsFile testname
+
 
 test_immediateParent2 = assertEqual "dir1" (getImmediateParentDir testname2)
 test_nakedFilename2 = assertEqual "file" (getNakedFileName testname2)
