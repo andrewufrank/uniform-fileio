@@ -128,6 +128,10 @@ test_addDir = assertEqual "/home/frank/test/files/" (toFilePath $ addDir testdir
 test_addDirEmpty = assertEqual "/home/frank/test/" (toFilePath $ addDir testdir1 (""::FilePath))
 
 
+instance Filenames4 FilePath FilePath  where
+    type FileResultT4 FilePath FilePath = FilePath
+    addDir p  d =  if null' d then p else (p </>) d
+
 instance Filenames4 (Path b Dir) FilePath  where
     type FileResultT4 (Path b Dir) FilePath = (Path b Dir)
     addDir p  d =  if null' d then p
