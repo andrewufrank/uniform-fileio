@@ -50,6 +50,8 @@ import  qualified         System.FilePath.Posix       as S -- prefered
 import Test.Framework
 -- import Test.Invariant
 
+--homeDir = Path.IO.getHomeDir :: Monad?? (Path Abs Dir
+homeDir =  makeAbsDir "/home/frank/":: Path Abs Dir
 
 makeRelFile :: FilePath -> Path Rel File
 makeRelDir :: FilePath -> Path Rel Dir
