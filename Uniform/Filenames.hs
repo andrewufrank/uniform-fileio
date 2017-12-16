@@ -52,6 +52,8 @@ import Test.Framework
 
 --homeDir = Path.IO.getHomeDir :: Monad?? (Path Abs Dir
 homeDir =  makeAbsDir "/home/frank/":: Path Abs Dir
+--    where
+--        callIO $ S.getHomeDirectory  -- will require IO
 
 makeRelFile :: FilePath -> Path Rel File
 makeRelDir :: FilePath -> Path Rel Dir
