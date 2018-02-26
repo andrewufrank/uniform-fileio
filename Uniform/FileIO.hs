@@ -7,8 +7,10 @@
 --  there are better (higher performance methods - replace while retaining conditions
 
 -- uses the Path and Path.IO framework
+
+-- this is the general export
 -----------------------------------------------------------------------------
-{-# OPTIONS_GHC -F -pgmF htfpp #-}
+--{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -47,8 +49,8 @@ import           Uniform.TypedFile
 
 import           Uniform.Zero
 
-import           Test.Framework
-import           Test.Invariant
+--import           Test.Framework
+--import           Test.Invariant
 
 
 --instance CharChains2 FilePath Text where
