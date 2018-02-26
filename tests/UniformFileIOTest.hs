@@ -20,7 +20,7 @@ module Main     where      -- must have Main (main) or Main where
 
 import            Test.Framework
 -- import    {-@ HTF_TESTS @-}        Uniform.FileIO
---import     {-@ HTF_TESTS @-}       Uniform.FileStrings
+import     {-@ HTF_TESTS @-}       Uniform.FileStrings_test
 ----import {-@ HTF_TESTS @-} FileIO.Text
 ----import {-@ HTF_TESTS @-} FileIO.ByteString
 ----import {-@ HTF_TESTS @-} TestingFileIO

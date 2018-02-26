@@ -9,7 +9,6 @@
 
 
 -----------------------------------------------------------------------------
---{-# OPTIONS_GHC -F -pgmF htfpp #-}
 --{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
@@ -29,10 +28,6 @@ module Uniform.Filenames  (
 --          , htf_thisModulesTests
              ) where
 --
--- --import qualified Data.Text as T
--- import qualified System.Posix  as P (FileStatus)
--- --import qualified System.Directory as S
---
 ---- using uniform:
 import           Uniform.Error hiding ((</>), (<.>))
 -- import           Uniform.Strings     hiding ((</>), (<.>))
@@ -47,8 +42,6 @@ import  qualified         System.FilePath.Posix       as S -- prefered
 --import  qualified         Filesystem.Path       as F -- prefered
 -- not usable, has a different definition of FilePath
 
---import Test.Framework
--- import Test.Invariant
 
 --homeDir = Path.IO.getHomeDir :: Monad?? (Path Abs Dir
 homeDir =  makeAbsDir "/home/frank/":: Path Abs Dir
