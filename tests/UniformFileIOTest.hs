@@ -27,7 +27,7 @@ import            Test.Framework
 import     {-@ HTF_TESTS @-}       Uniform.Filenames_test
 --import    {-@ HTF_TESTS @-}        Uniform.FileStatus
 --import     {-@ HTF_TESTS @-}       Uniform.Piped
---import    {-@ HTF_TESTS @-}        Uniform.TypedFile
+import    {-@ HTF_TESTS @-}        Uniform.TypedFile_test
 
 import           Uniform.Strings
 
