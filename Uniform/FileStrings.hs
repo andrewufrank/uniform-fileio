@@ -70,7 +70,7 @@ import qualified System.Posix           as P
 import           Control.Arrow          (second)
 import           Control.DeepSeq        (force, ($!!))
 import           Control.Exception      (SomeException, catch)
-import           Control.Monad.Catch
+import           Control.Monad.Catch    as Catch
 import           Control.Monad.IO.Class
 import           Data.Either            (isLeft)
 import           Data.List              (isPrefixOf)
@@ -427,5 +427,14 @@ instance FileOps2 (Path ar File) L.ByteString where
     appendFile2  fp st = callIO  $  L.appendFile  (unL fp) st
 
 
---
---
+--bracket2
+--        :: IO a         -- ^ computation to run first (\"acquire resource\")
+--        -> (a -> IO b)  -- ^ computation to run last (\"release resource\")
+--        -> (a -> IO c)  -- ^ computation to run in-between
+--        -> IO c         -- returns the value from the in-between computation
+--bracket before after thing =
+--  Catch.mask $ \restore -> do
+--    a <- before
+--    r <- restore (thing a) `onException` after a
+--    _ <- after a
+--    return r
