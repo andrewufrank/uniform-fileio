@@ -28,6 +28,10 @@ module Uniform.FileIO (
          , module Uniform.TypedFile
          , module Uniform.FileStrings
          , module Uniform.Piped
+         -- from Path.IO
+         , doesFileExist, getAppUserDataDir, renameFile
+         , makeAbsolute
+
 --         , Handle, IOMode (..)
 --        , EpochTime
             ) where
@@ -48,7 +52,7 @@ import           Uniform.Piped
 import           Uniform.TypedFile
 
 import           Uniform.Zero
-
+import Path.IO (doesFileExist, getAppUserDataDir, renameFile, makeAbsolute)
 --import           Test.Framework
 --import           Test.Invariant
 

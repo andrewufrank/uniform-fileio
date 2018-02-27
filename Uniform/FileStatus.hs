@@ -44,7 +44,7 @@ module Uniform.FileStatus ( htf_thisModulesTests
 
 --import qualified Data.Text as T
 --import Path
-import Path.IO
+--import Path.IO
 import qualified System.Posix as P
 import qualified System.Directory as S
 ----import Basics

@@ -21,11 +21,11 @@ module Uniform.FileStrings (
              module Uniform.Filenames   -- exports Path
             , module Uniform.FileIOalgebra
 --            , module Path
-            , module Path.IO
+--            , module Path.IO
             , SIO.IOMode (..)  -- from System.IO
             , closeFile2
             , listDir'
-            , readFile5
+--            , readFile5
             , TIO.hGetLine, TIO.hPutStr  -- for other implementations of FileHandle
 
 --    , readFileT, writeFileT
@@ -45,7 +45,7 @@ import           Path                   as P
 import           Path.IO                as P
 
 import           Path
-import           Path.IO
+--import           Path.IO
 
 -- what is further required?
 import qualified System.IO              as SIO
@@ -97,9 +97,6 @@ instance FileHandles [Text] where
             res <-  callIO $ TIO.hGetLine h
             return . lines' $ res
 
---for testing:
-readFile5 :: Path ar File -> IO Text
-readFile5 = fmap s2t .readFile . toFilePath
 
 
 listDir' :: (MonadIO m, MonadThrow m)

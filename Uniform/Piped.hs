@@ -31,6 +31,7 @@ import qualified Pipes.Prelude as PipePrelude
 --import Control.Monad (forM_)
 
 --import System.Directory (doesDirectoryExist, getDirectoryContents)
+--import System.Directory (doesDirectoryExist, getDirectoryContents)
 import System.Environment (getArgs)
 --import System.FilePath ((</>))
 --import System.IO (openFile, IOMode (..), hClose)
@@ -45,6 +46,7 @@ import Uniform.Strings hiding ((<.>), (</>))
 import Uniform.FileStrings
 import Uniform.Filenames
 import Data.List (sort)
+import qualified Path.IO as PIO
 
 import Test.Framework
 --import Test.Invariant
@@ -56,14 +58,14 @@ getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (Erro
 getRecursiveContents  fp = do
 --    putIOwords ["recurseDir start", showT fp]
     perm <-Pipe.lift $ getPermissions' fp
-    if not (readable perm && searchable perm)
+    if not (PIO.readable perm && PIO.searchable perm)
         then Pipe.lift $ putIOwords ["recurseDir not readable or not searchable", showT fp]
         else do
             symLink <- Pipe.lift $ checkSymbolicLink fp -- callIO $ xisSymbolicLink fp
             if symLink
                 then  Pipe.lift $ putIOwords ["recurseDir symlink", showT fp]
                 else do
-                    (dirs, files) <- Pipe.lift $ listDir  fp
+                    (dirs, files) <- Pipe.lift $ PIO.listDir  fp
                     when False $ do
                         Pipe.lift $ putIOwords ["recurseDir files\n", showT files]
                         Pipe.lift $ putIOwords ["recurseDir directories\n", showT dirs]
@@ -72,27 +74,6 @@ getRecursiveContents  fp = do
                     Prelude.mapM_ (getRecursiveContents) (sort dirs)
                     return ()--    where processOneFile fp = Pipe.yield fp
 
-
---test_recursive = do
---    let testdir = makeRelDir "testDirFileIO"
---    let resfileN = makeRelFile "testDirResN"
---    let resfile0 = makeRelFile "testDirRes0"
---    testdir2 <- makeAbsolute testdir
---    runErr $ do
---        hand <-   openFile2handle resfileN WriteMode
---        Pipe.runEffect $
---            getRecursiveContents testdir2
---            >-> PipePrelude.map  toFilePath
---    ----    >-> P.stdoutLn
---            >-> PipePrelude.toHandle hand
---        closeFile2 hand
---    res0  ::Text <-  readFile5  resfile0
---    resN :: Text <-  readFile5 resfileN
---    assertEqual res0 resN
-
-
---readFile5 :: Path ar File -> IO Text
---readFile5 = fmap s2t .readFile . toFilePath
 
 
 

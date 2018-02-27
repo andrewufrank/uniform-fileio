@@ -36,7 +36,7 @@ import           Uniform.Error hiding ((</>), (<.>))
 import Path   hiding ( (</>), (<.>) ) -- should I hide the quasi quoters?
 import qualified Path   ((</>))
 --import qualified          System.Posix.FilePath as P
-import Path.IO
+--import Path.IO
 import  qualified         System.FilePath       as S -- prefered
 import  qualified         System.FilePath.Posix       as S -- prefered
 import qualified Data.List.Split          as S

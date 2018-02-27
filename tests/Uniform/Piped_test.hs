@@ -50,27 +50,27 @@ import Test.Framework
 --import Test.Invariant
 --
 
-getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())
-                  Path Abs Dir
-                      -> Pipe.Proxy Pipe.X () () (Path Abs File) (ErrorT Text IO) ()
-getRecursiveContents  fp = do
---    putIOwords ["recurseDir start", showT fp]
-    perm <-Pipe.lift $ getPermissions' fp
-    if not (readable perm && searchable perm)
-        then Pipe.lift $ putIOwords ["recurseDir not readable or not searchable", showT fp]
-        else do
-            symLink <- Pipe.lift $ checkSymbolicLink fp -- callIO $ xisSymbolicLink fp
-            if symLink
-                then  Pipe.lift $ putIOwords ["recurseDir symlink", showT fp]
-                else do
-                    (dirs, files) <- Pipe.lift $ listDir  fp
-                    when False $ do
-                        Pipe.lift $ putIOwords ["recurseDir files\n", showT files]
-                        Pipe.lift $ putIOwords ["recurseDir directories\n", showT dirs]
-
-                    Prelude.mapM_ (Pipe.yield) (sort files)
-                    Prelude.mapM_ (getRecursiveContents) (sort dirs)
-                    return ()--    where processOneFile fp = Pipe.yield fp
+--getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())
+--                  Path Abs Dir
+--                      -> Pipe.Proxy Pipe.X () () (Path Abs File) (ErrorT Text IO) ()
+--getRecursiveContents  fp = do
+----    putIOwords ["recurseDir start", showT fp]
+--    perm <-Pipe.lift $ getPermissions' fp
+--    if not (readable perm && searchable perm)
+--        then Pipe.lift $ putIOwords ["recurseDir not readable or not searchable", showT fp]
+--        else do
+--            symLink <- Pipe.lift $ checkSymbolicLink fp -- callIO $ xisSymbolicLink fp
+--            if symLink
+--                then  Pipe.lift $ putIOwords ["recurseDir symlink", showT fp]
+--                else do
+--                    (dirs, files) <- Pipe.lift $ listDir  fp
+--                    when False $ do
+--                        Pipe.lift $ putIOwords ["recurseDir files\n", showT files]
+--                        Pipe.lift $ putIOwords ["recurseDir directories\n", showT dirs]
+--
+--                    Prelude.mapM_ (Pipe.yield) (sort files)
+--                    Prelude.mapM_ (getRecursiveContents) (sort dirs)
+--                    return ()--    where processOneFile fp = Pipe.yield fp
 
 
 --test_recursive = do

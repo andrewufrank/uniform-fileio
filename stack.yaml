@@ -6,11 +6,12 @@ packages:
 - ../uniform-error
 - ../uniform-algebras
 - ../../path
+- ../../path-io
 extra-deps:
 - genvalidity-0.3.2.0
 - genvalidity-property-0.0.0.0
 - path-0.6.2
-- path-io-1.3.3
+- path-io-1.3.3.1
 - test-invariant-0.4.5.0
 - validity-0.3.3.0
 resolver: lts-9.1
