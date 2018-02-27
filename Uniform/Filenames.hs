@@ -33,12 +33,13 @@ import           Uniform.Error hiding ((</>), (<.>))
 -- import           Uniform.Strings     hiding ((</>), (<.>))
             -- (s2t, showT, t2s, removeChar, CharChains2 (..), Text)
 --import Safe   -- todo error
-import Path   hiding ( (</>) ) -- should I hide the quasi quoters?
+import Path   hiding ( (</>), (<.>) ) -- should I hide the quasi quoters?
 import qualified Path   ((</>))
 --import qualified          System.Posix.FilePath as P
 import Path.IO
 import  qualified         System.FilePath       as S -- prefered
 import  qualified         System.FilePath.Posix       as S -- prefered
+import qualified Data.List.Split          as S
 --import  qualified         Filesystem.Path       as F -- prefered
 -- not usable, has a different definition of FilePath
 
@@ -62,17 +63,52 @@ toShortFilePath :: Path df ar -> FilePath
 ---- ^ get the filepath, but without the trailing separator, necessary for systemcalls
 toShortFilePath = S.dropTrailingPathSeparator . Path.toFilePath
 
+instance Read (Path Abs Dir) where
+        readsPrec i r =   maybe []  (\res -> [(res, rem)] ) $ parseAbsDir x
+                where  [(x ::String , rem)] = readsPrec i r
+instance Read (Path Abs File) where
+        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseAbsFile x
+                where  [(x ::String , rem)] = readsPrec i r
+--                       mres = parseAbsFile x :: Maybe (Path Abs File)
+
+instance Read (Path Rel Dir) where
+        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseRelDir x
+                where  [(x ::String , rem)] = readsPrec i r
+instance Read (Path Rel File) where
+        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseRelFile x
+                where  [(x ::String , rem)] = readsPrec i r
+
 --instance Show (Path Rel File) where
 --    show p = toFilePath  p
-instance Read (Path Rel File) where
-        readsPrec _ r = [(makeRelFile r,"")]
-instance Read (Path Rel Dir) where
-        readsPrec _ r = [(makeRelDir r,"")]
-instance Read (Path Abs File) where
-        readsPrec _ r = [(makeAbsFile r,"")]
-instance Read (Path Abs Dir) where
-        readsPrec _ r = [(makeAbsDir r,"")]
-
+--instance Read (Path Rel File) where
+--        readsPrec _ r = case parseRelFile r of
+--                            Nothing -> []
+--                            Just f -> [(f,"")]
+----                            [(makeRelFile r,"")]
+--instance Read (Path Rel Dir) where
+--        readsPrec _ r = [(makeRelDir r,"")]
+----instance Read (Path Abs File) where
+----        readsPrec _ r = case length d of
+----                        0 -> []
+----                        1 -> case parseAbsFile (head d) of
+----                            Nothing -> []
+----                            Just f -> [(f,"")]
+----                        2 -> case parseAbsFile (head d) of
+----                            Nothing -> []
+----                            Just f -> [(f,concat . tail $ d)]
+----                where d = S.splitOn "," r  :: [String]
+------        readsPrec _ r = [(makeAbsFile r,"")]
+--instance Read (Path Abs Dir) where
+--        readsPrec _ r = [(makeAbsDir r,"")]
+--
+--instance Read (Path Abs File) where
+--        readsPrec i r =   [(makeAbsFile x, rem)]
+--                where  [(x ::String , rem)] = readsPrec i r
+--instance Read (Path Abs File) where
+--        readsPrec i r =  case parseRelFile r of
+--                            Nothing -> []
+--                            Just f -> [(makeAbsFile r,s1)]
+--                where [(s :: String ,s1)] = readsPrec i r
 
 
 instance CharChains2 (Path a d) String where show'  = show

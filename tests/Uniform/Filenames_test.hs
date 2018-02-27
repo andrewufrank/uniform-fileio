@@ -45,7 +45,7 @@ import Test.Framework
 import Uniform.Filenames
 
 
-
+--
 test_show = assertEqual "\"afile\"" (show g1)
 test_read = assertEqual  g1 (read "afile")
 
@@ -78,7 +78,81 @@ testname2 = makeAbsFile testname
 test_immediateParent2 = assertEqual "dir1" (getImmediateParentDir testname2)
 test_nakedFilename2 = assertEqual "file" (getNakedFileName testname2)
 
+--------
+x1f = makeAbsFile f3 :: Path Abs File
+x1t = showT x1f
+x1s = t2s x1t
 
+test_sp = assertEqual "\"/somedir/more/afile.ext\"" (show x1f)
+
+test_sp1 = assertEqual ("/somedir/more/afile.ext"::String) (read x1s)
+
+data S2 = S2 String String deriving (Show, Read,  Eq)
+--instance Read S2 where
+--    readsPrec i s = [(S2 a b, r)]
+--        where
+--            [(b, r)] = readsPrec i s2
+--            [(a, s2)] = readsPrec i s
+
+test_p = assertEqual [("DREI", " someMore")] (readsPrec 0 "\"DREI\" someMore" )
+
+s2a = S2 "eins" "zwei"
+s2as = show s2a   -- "S2 \"eins\" \"zwei\""
+
+test_s2aa = assertEqual "S2 \"eins\" \"zwei\"" (s2as)
+test_s2a = assertEqual s2a (read   "S2 \"eins\" \"zwei\"")
+
+data Xt = Xt { p :: Path Abs File
+                , q :: Text
+                } deriving (Show, Read, Eq)
+
+--instance Read (Path Abs File) where
+--        readsPrec i r =   -- r ist  "/somedir/more/afile.ext", q = "f3"}
+--                             [(makeAbsFile x, rem)] -- ", q = \"f3\"")]
+--                where
+--                    [(x ::String , rem)] = readsPrec i r
+
+xt = Xt x1f "f3"
+xts = show xt
+
+test_xt1 = do
+        putIOwords ["xt1 - xts is:", s2t xts]
+        putIOwords ["xt1 - show xt is:", showT xt]
+        assertEqual xt  (read $ xts)
+
+
+--test_rp = do
+--        putIOwords ["rp - f3 :", s2t  f3s]
+--        assertEqual [(x1f, "")] (readsPrec 0 f3s :: [(Path Abs File, String)]  )
+--
+--test_r2 = assertEqual x1f (readNote "r2" f3s)
+--f3s = show x1f
+--
+----instance Show (Path Abs File) where
+----    show = toFilePath
+--
+--test_xt2 = do   -- ok
+--        putIOwords ["xt2 - s:",   x1s]
+--        putIOwords ["xt1 - show p . xt is:", showT . p $ xt]
+--        assertEqual x1f  (readT $ x1s)
+--
+--test_rp2 = do  -- ok
+--        putIOwords ["xt2 - x1s:",   x1s]
+----        putIOwords ["xt1 - show p . xt is:", showT . p $ xt]
+--        assertEqual [(x1f,"")]  (readsPrec 0 . t2s $ x1s)
+--
+--test_rp3 = do
+--        putIOwords ["xt2 - x1ss:",  s2t x1ss]
+----        putIOwords ["xt1 - show p . xt is:", showT . p $ xt]
+--        assertEqual [(x1f,"")]  (readsPrec 0   $ x1ss)
+--
+--
+--
+--xt2r = readT xt2 :: Xt
+--readT :: Read a => Text -> a
+--readT s = readNote "readNotJust" . t2s $ s
+--xt2 = showT xt  :: Text
+--x1ss = t2s x1s ++ ", some text" :: String
 ------------------tests
 
 -- rigerous filepath testing is difficult,

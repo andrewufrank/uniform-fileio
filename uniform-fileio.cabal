@@ -32,9 +32,10 @@ library
             unix -any,
             pipes ,
             safe,
-            path,
+            path >=0.6.1,
             path-io,
             exceptions,
+            split,
 -- for tests
             HTF, test-invariant
 --            QuickCheck,
