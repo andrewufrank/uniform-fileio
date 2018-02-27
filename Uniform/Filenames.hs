@@ -63,20 +63,20 @@ toShortFilePath :: Path df ar -> FilePath
 ---- ^ get the filepath, but without the trailing separator, necessary for systemcalls
 toShortFilePath = S.dropTrailingPathSeparator . Path.toFilePath
 
-instance Read (Path Abs Dir) where
-        readsPrec i r =   maybe []  (\res -> [(res, rem)] ) $ parseAbsDir x
-                where  [(x ::String , rem)] = readsPrec i r
-instance Read (Path Abs File) where
-        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseAbsFile x
-                where  [(x ::String , rem)] = readsPrec i r
---                       mres = parseAbsFile x :: Maybe (Path Abs File)
-
-instance Read (Path Rel Dir) where
-        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseRelDir x
-                where  [(x ::String , rem)] = readsPrec i r
-instance Read (Path Rel File) where
-        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseRelFile x
-                where  [(x ::String , rem)] = readsPrec i r
+--instance Read (Path Abs Dir) where
+--        readsPrec i r =   maybe []  (\res -> [(res, rem)] ) $ parseAbsDir x
+--                where  [(x ::String , rem)] = readsPrec i r
+--instance Read (Path Abs File) where
+--        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseAbsFile x
+--                where  [(x ::String , rem)] = readsPrec i r
+----                       mres = parseAbsFile x :: Maybe (Path Abs File)
+--
+--instance Read (Path Rel Dir) where
+--        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseRelDir x
+--                where  [(x ::String , rem)] = readsPrec i r
+--instance Read (Path Rel File) where
+--        readsPrec i r =  maybe []  (\res -> [(res, rem)] ) $ parseRelFile x
+--                where  [(x ::String , rem)] = readsPrec i r
 
 --instance Show (Path Rel File) where
 --    show p = toFilePath  p
