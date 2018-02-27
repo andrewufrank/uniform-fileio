@@ -47,12 +47,12 @@ import Uniform.Filenames
 
 --
 test_show = assertEqual "\"afile\"" (show g1)
-test_read = assertEqual  g1 (read "afile")
+test_read = assertEqual  g1 (read "\"afile\"")
 
 test_read2 = assertEqual g1 (makeRelFile "afile")
 
 --test_readrd = assertEqual  g1 (read "afile")
-test_readaf = assertEqual  g3 (read "/somedir/more/afile.ext")
+test_readaf = assertEqual  g3 (read "\"/somedir/more/afile.ext\"")
 --test_readrf = assertEqual  g1 (read "afile")
 
 testdir1 = makeAbsDir "/home/frank/test"
@@ -120,6 +120,7 @@ test_xt1 = do
         putIOwords ["xt1 - show xt is:", showT xt]
         assertEqual xt  (read $ xts)
 
+xt2 = Xt {p = "/somedir/more/afile.ext", q = "f3"}
 
 --test_rp = do
 --        putIOwords ["rp - f3 :", s2t  f3s]
