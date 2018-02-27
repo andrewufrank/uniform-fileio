@@ -31,6 +31,7 @@ module Uniform.FileIO (
          -- from Path.IO
          , doesFileExist, getAppUserDataDir, renameFile
          , makeAbsolute
+         , module Path   -- ()exports all instances?
 
 --         , Handle, IOMode (..)
 --        , EpochTime
@@ -53,7 +54,7 @@ import           Uniform.TypedFile
 
 import           Uniform.Zero
 import Path.IO (doesFileExist, getAppUserDataDir, renameFile, makeAbsolute)
---import           Test.Framework
+import           Path hiding ((</>), (<.>))
 --import           Test.Invariant
 
 

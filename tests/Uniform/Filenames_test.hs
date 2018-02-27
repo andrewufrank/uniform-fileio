@@ -113,6 +113,7 @@ data Xt = Xt { p :: Path Abs File
 --                    [(x ::String , rem)] = readsPrec i r
 
 xt = Xt x1f "f3"
+xt3 = Xt "/somedir/more/afile.ext" "f3"
 xts = show xt
 
 test_xt1 = do
