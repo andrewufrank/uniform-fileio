@@ -18,142 +18,82 @@
     #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
-module  Uniform.Piped (htf_thisModulesTests
---        pipedDo, pipedDoIO
-            , getRecursiveContents
-
-
-            ) where
+module  Uniform.Piped_test where
 
 import qualified Pipes as Pipe
 import  Pipes ((>->))
 import qualified Pipes.Prelude as PipePrelude
---import Control.Monad (forM_)
-
---import System.Directory (doesDirectoryExist, getDirectoryContents)
-import System.Environment (getArgs)
---import System.FilePath ((</>))
---import System.IO (openFile, IOMode (..), hClose)
-
----- using uniform:
-import Uniform.Error
---import Uniform.Zero
-import Uniform.Strings hiding ((<.>), (</>))
+----import Control.Monad (forM_)
 --
---import FileIO.Filenames
---import Uniform.FileIO
-import Uniform.FileStrings
+----import System.Directory (doesDirectoryExist, getDirectoryContents)
+--import System.Environment (getArgs)
+----import System.FilePath ((</>))
+----import System.IO (openFile, IOMode (..), hClose)
+--
+------ using uniform:
+--import Uniform.Error
+----import Uniform.Zero
+import Uniform.Strings hiding ((<.>), (</>))
+----
 import Uniform.Filenames
-import Data.List (sort)
+----import Uniform.FileIO
+import Uniform.FileStrings (openFile2handle, closeFile2, IOMode(..))
+--import Uniform.Filenames
+--import Data.List (sort)
 
 import Test.Framework
 --import Test.Invariant
---
-
---getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())
---                  Path Abs Dir
---                      -> Pipe.Proxy Pipe.X () () (Path Abs File) (ErrorT Text IO) ()
---getRecursiveContents  fp = do
-----    putIOwords ["recurseDir start", showT fp]
---    perm <-Pipe.lift $ getPermissions' fp
---    if not (readable perm && searchable perm)
---        then Pipe.lift $ putIOwords ["recurseDir not readable or not searchable", showT fp]
---        else do
---            symLink <- Pipe.lift $ checkSymbolicLink fp -- callIO $ xisSymbolicLink fp
---            if symLink
---                then  Pipe.lift $ putIOwords ["recurseDir symlink", showT fp]
---                else do
---                    (dirs, files) <- Pipe.lift $ listDir  fp
---                    when False $ do
---                        Pipe.lift $ putIOwords ["recurseDir files\n", showT files]
---                        Pipe.lift $ putIOwords ["recurseDir directories\n", showT dirs]
---
---                    Prelude.mapM_ (Pipe.yield) (sort files)
---                    Prelude.mapM_ (getRecursiveContents) (sort dirs)
---                    return ()--    where processOneFile fp = Pipe.yield fp
-
-
---test_recursive = do
---    let testdir = makeRelDir "testDirFileIO"
---    let resfileN = makeRelFile "testDirResN"
---    let resfile0 = makeRelFile "testDirRes0"
---    testdir2 <- makeAbsolute testdir
---    runErr $ do
---        hand <-   openFile2handle resfileN WriteMode
---        Pipe.runEffect $
---            getRecursiveContents testdir2
---            >-> PipePrelude.map  toFilePath
---    ----    >-> P.stdoutLn
---            >-> PipePrelude.toHandle hand
---        closeFile2 hand
---    res0  ::Text <-  readFile5  resfile0
---    resN :: Text <-  readFile5 resfileN
---    assertEqual res0 resN
-
-
---readFile5 :: Path ar File -> IO Text
---readFile5 = fmap s2t .readFile . toFilePath
+import Uniform.Piped
+import qualified Path.IO as Path.IO (makeAbsolute)
 
 
 
+test_recursive = do
+    let testdir = makeRelDir "testDirFileIO"
+    let resfileN = makeRelFile "testDirResN"
+    let resfile0 = makeRelFile "testDirRes0"
+    testdir2 <- fmap Path $ Path.IO.makeAbsolute (unPath testdir)
+    runErr $ do
+        hand <-   openFile2handle resfileN WriteMode
+        Pipe.runEffect $
+            getRecursiveContents testdir2
+            >-> PipePrelude.map  toFilePath
+    ----    >-> P.stdoutLn
+            >-> PipePrelude.toHandle hand
+        closeFile2 hand
+    res0  ::Text <-  readFile5  resfile0
+    resN :: Text <-  readFile5 resfileN
+    assertEqual res0 resN
 
 
 
+testDir =  makeAbsDir "/home/frank/Workspace8/uniform-fileio/testDirFileIO"
+test_getRec = do
+    res <- runErr $ pipedDo testDir (showT)
+    assertEqual (Right ()) res
+    -- check manually
 
--------------------old
---getRecursiveContents :: LegalPathname -> Producer LegalPathname  ErrIO ()
---getRecursiveContents topPath = do
---
-----  lift $ putIOwords ["getRecursiveContents", showT topPath]
---  properNames <- lift $ getDirContentNonHidden topPath
---  -- lift into Producer (ie. proxy)
-----  let properNames = filter (`notElem` [".", ".."]) names
---  forM_ properNames $ \name -> do
---    let path = topPath </> name
---    isLink <- lift $ checkSymbolicLink path
---    if isLink then return ()
---        else do
---            isDirectory <- lift $ doesDirExist path
---            isReadExecutable <- lift $ getFileAccess path (True, False, True)
---            if isDirectory && isReadExecutable
---              then   getRecursiveContents path
---              else  do
---                    isReadable <- lift $ getFileAccess path (True, False, False)
-----                    lift $ putIOwords ["getRecursiveContents isReadable"
-----                                    , showT isReadable, showT path]
---                    if isReadable
---                            then yield path
---                            else return ()
---
----- examples how to use...
---
---pipedDo :: LegalPathname -> (LegalPathname -> Text) -> ErrIO ()
---pipedDo path transf =  do
---
---  runEffect $
---    getRecursiveContents path
---    >-> P.map (t2s . transf)
---    >-> P.stdoutLn
---
---testDir = fromJustNote "testdir" $ makeLegalPath "/home/frank/Workspace8/uniform-fileio/testDirFileIO"
---test_getRec = do
---    res <- runErr $ pipedDo testDir (showT)
---    assertEqual (Right ()) res
---    -- check manually
---
---
---
---
---pipedDoIO :: LegalPathname -> LegalPathname -> (LegalPathname -> ErrIO Text) -> ErrIO ()
+----for testing:
+readFile5 :: Path ar File -> IO Text
+readFile5 = fmap s2t .readFile . toFilePath
+
+pipedDo :: Path Abs Dir -> (Path Abs File -> Text) -> ErrIO ()
+pipedDo path transf =  do
+  Pipe.runEffect $
+    getRecursiveContents path
+    >-> PipePrelude.map (t2s . transf)
+    >-> PipePrelude.stdoutLn
+
+--pipedDoIO :: Path Abs File -> Path Abs Dir -> (Path Abs File -> ErrIO Text) -> ErrIO ()
 ---- | write to the first filename the operation applied to the dir tree in the second
 ---- first path must not be non-readable dir or
 --pipedDoIO file path transf =  do
---  hand <-   openFile file WriteMode
---  runEffect $
---    getRecursiveContents path
---    >-> P.mapM (fmap t2s . transf)
-----    >-> P.stdoutLn
---    >-> P.toHandle hand
---  closeFile2 hand
-
+--    hand <-   openFile2handle file WriteMode
+--    Pipe.runEffect $
+--                getRecursiveContents path
+--                >-> PipePrelude.map (fmap t2s . transf)  -- some IO type left?
+--                --    >-> P.stdoutLn
+--                >-> PipePrelude.toHandle hand
+----                >-> (\s -> PipePrelude.toHandle hand (s::String))
+--    closeFile2 hand
 

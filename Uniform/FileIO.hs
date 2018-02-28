@@ -31,7 +31,7 @@ module Uniform.FileIO (
          -- from Path.IO
          , doesFileExist, getAppUserDataDir, renameFile
          , makeAbsolute
-         , module Path   -- ()exports all instances?
+--         , module Path   -- ()exports all instances?
 
 --         , Handle, IOMode (..)
 --        , EpochTime

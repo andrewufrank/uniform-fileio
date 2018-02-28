@@ -64,9 +64,9 @@ import qualified Data.ByteString.Lazy   as L
 import           Data.Either            (isLeft)
 --import           Data.List              (isPrefixOf)
 
---for testing:
-readFile5 :: Path ar File -> IO Text
-readFile5 = fmap s2t .readFile . toFilePath
+----for testing:
+--readFile5 :: Path ar File -> IO Text
+--readFile5 = fmap s2t .readFile . toFilePath
 
 
 --------------------------test with path

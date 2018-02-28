@@ -36,15 +36,16 @@ module Uniform.FileStrings (
 --import Uniform.Error
 import           Uniform.FileIOalgebra
 --import           Uniform.FilenamesAlgebra
+import           Uniform.Filenames as FN
 import           Uniform.Filenames
 import           Uniform.FileStatus
 -- import           Uniform.Strings hiding ((<.>), (</>))
 
 
-import           Path                   as P
-import           Path.IO                as P
+import  qualified         Path                   as Path
+import  qualified         Path.IO                as PathIO
 
-import           Path
+--import           Path
 --import           Path.IO
 
 -- what is further required?
@@ -65,9 +66,9 @@ import qualified System.Directory       as D
 import qualified System.FilePath        as OS
 --       (addExtension, makeRelative, FilePath, combine, splitPath,
 --        takeDirectory, replaceExtension, takeExtension)
-import qualified System.Posix           as P
+import qualified System.Posix           as Posix
 -- for fileAccess
-import           Control.Arrow          (second)
+import           Control.Arrow          (first, second)
 import           Control.DeepSeq        (force, ($!!))
 import           Control.Exception      (SomeException, catch)
 import           Control.Monad.Catch    as Catch
@@ -102,7 +103,10 @@ instance FileHandles [Text] where
 listDir' :: (MonadIO m, MonadThrow m)
   => Path b Dir          -- ^ Directory to list
   -> m ([Path Abs Dir], [Path Abs File]) -- ^ Sub-directories and files
-listDir' = P.listDir
+listDir' p =  do
+    abList ::([Path.Path Abs Dir], [Path.Path Abs File]) <- PathIO.listDir . unPath $ p
+    let abPathList = first (map Path) . second ( map Path)  $ abList
+    return abPathList
 -- would require a class and an implementation for FilePath
 
 instance FileSystemOps FilePath where
@@ -253,7 +257,7 @@ instance FileOps FilePath  where
 --    getSymbolicLinkStatus :: fp ->   ErrIO (Maybe P.FileStatus)
     getSymbolicLinkStatus fp = do
         --    putIOwords ["fileio getSymbolicLinkStatus", fp]
-            st <- callIO $ P.getSymbolicLinkStatus fp
+            st <- callIO $ Posix.getSymbolicLinkStatus fp
         --    putIOwords ["fileio getSymbolicLinkStatus done", fp]
             return  $ st
 --          `catchError` (\s -> do
@@ -264,7 +268,7 @@ instance FileOps FilePath  where
     --   is the status of the link, does not follow the link
 
     getFileAccess fp (r,w,e) = callIO $
-         P.fileAccess fp r w  e
+         Posix.fileAccess fp r w  e
 --              `catchError` \e -> do
 --                     putIOwords ["getFileAccess error", showT fp, s2t $ show e]
 --                     return False
@@ -280,7 +284,7 @@ instance FileOps FilePath  where
 --        return $ timea < timeb
 
     getFileModificationTime  fp = do
-        stat :: P.FileStatus <- getFileStatus' fp
+        stat :: Posix.FileStatus <- getFileStatus' fp
         let
             time = getModificationTimeFromStatus stat
         return time
@@ -298,13 +302,13 @@ instance FileOps FilePath  where
 --mkL = mkFilepath lpX . s2t
 
 instance FileSystemOps (Path ar df) where
-    getPermissions' = P.getPermissions
+    getPermissions' = PathIO.getPermissions . unPath
     checkSymbolicLink  fp =   callIO $ D.pathIsSymbolicLink (unL fp)
 
-instance DirOps (P.Path ar Dir)  where
-    doesDirExist' =  P.doesDirExist
+instance DirOps (Path ar Dir)  where
+    doesDirExist' =  PathIO.doesDirExist .unPath
 --    getDirPermissions = P.getPermissions
-    createDir'  = P.createDir
+    createDir'  = PathIO.createDir . unPath
 --        do
 --        t <- doesFileOrDirExist fp
 --        if not t then  callIO $ D.createDirectory . unL $ fp
@@ -312,10 +316,10 @@ instance DirOps (P.Path ar Dir)  where
 --                ["File or Dir exists", showT fp]
 
 
-    createDirIfMissing' = P.createDirIfMissing True
+    createDirIfMissing' = PathIO.createDirIfMissing True . unPath
 
-instance FileOps (P.Path ar File)  where
-    doesFileExist'   =  P.doesFileExist
+instance FileOps (Path ar File)  where
+    doesFileExist'   =  PathIO.doesFileExist . unPath
 --    getPermissions' = P.getPermissions
 
     getMD5 fp = getMD5 (unL fp)
@@ -358,13 +362,13 @@ instance FileOps (P.Path ar File)  where
             callIO $
                 (do
 
-                    P.fileAccess (unL fp) r w  e
+                    Posix.fileAccess (unL fp) r w  e
               `catchError` \e -> do
                      putIOwords ["getFileAccess error", showT fp, s2t $ show e]
                      return False )
 
 
-unL = P.toFilePath
+unL = FN.toFilePath
 
 
 readFileT :: Path ar File  -> ErrIO Text

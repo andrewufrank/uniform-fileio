@@ -20,12 +20,12 @@ module Uniform.TypedFile (
 
 --import           Uniform.Error
 import           Uniform.FileIOalgebra (Handle)
-import           Uniform.Filenames
+import           Uniform.Filenames as FN
 import           Uniform.FileStrings
 --import           Uniform.FileIO (EpochTime, getFileModificationTime)
 import           Uniform.FileStatus
 --import           Uniform.Strings hiding ((</>))
-import qualified Path.IO as PIO
+import qualified Path.IO (ensureDir)
 
 data TypedFile5 a b = TypedFile5 { tpext5 :: Extension}
 
@@ -41,11 +41,11 @@ class (FileHandles a) =>
 --    mkTypedFile5  :: TypedFile5 a b
     -- no argument, the extension is encapsulated in instance def
     -- replace by makeTyped
-    write5 :: Path Abs Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
+    write5 :: FN.Path Abs Dir -> Path Rel File -> TypedFile5 a b -> a -> ErrIO ()
     -- write a file, directory is created if not exist
     -- file, if exist, is replaced
     write5 fp fn tp  ct = do
-        dirx <- PIO.ensureDir fp
+        dirx <- Path.IO.ensureDir (unPath fp)
 --        let fn2 = fn <.> tpext5 tp -- :: Path ar File
         write6 (fp </> fn  ) tp ct
 
@@ -134,12 +134,12 @@ instance TypedFiles5 [Text] () where
     -- file contains a list of lines (text)
 --    mkTypedFile5  = TypedFile5 { tpext5 = Extension "txt"}
     write5 fp fn tp  ct = do
-        dirx <- PIO.ensureDir fp
+        dirx <- Path.IO.ensureDir (unPath fp)
         let fn2 = fn <.> tpext5 tp -- :: Path ar File
         writeFile2 (fp </> fn2 ) (unlines' ct)
 --      writeFile2 (fp </> (fn <.> (tpext tp) )) . unlines'
     append5 fp fn tp  ct = do
-        dirx <- PIO.ensureDir fp
+        dirx <- Path.IO.ensureDir (unPath fp)
         let fn2 = fn <.> tpext5 tp -- :: Path ar File
         appendFile2 (fp </> fn2 ) (unlines' ct)
     read5 fp fn tp   = do
