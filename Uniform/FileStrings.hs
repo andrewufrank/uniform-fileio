@@ -132,9 +132,10 @@ instance DirOps FilePath where
                 else do
                      callIO $ putStrLn "renamed"
                      r <- callIO $ D.renameDirectory (old) (new)
-                     return $ unwordsT
-                        [ "renamed dir from ", showT old
-                            , " to " , showT  new]
+                     return ()
+--                     $ unwordsT
+--                        [ "renamed dir from ", showT old
+--                            , " to " , showT  new]
 
 instance FileOps FilePath  where
     doesFileExist'   = callIO . D.doesFileExist
@@ -314,6 +315,12 @@ instance DirOps (Path ar Dir)  where
 --        if not t then  callIO $ D.createDirectory . unL $ fp
 --            else throwErrorT
 --                ["File or Dir exists", showT fp]
+    renameDir' old new = do  -- :: fp -> fp ->  ErrIO Text
+    -- ^ rename directory old to new
+        PathIO.renameDir (unPath old) (unPath new)
+--        return $ unwordsT
+--                        [ "renamed dir from ", showT old
+--                            , " to " , showT  new]
 
 
     createDirIfMissing' = PathIO.createDirIfMissing True . unPath
@@ -321,6 +328,10 @@ instance DirOps (Path ar Dir)  where
 instance FileOps (Path ar File)  where
     doesFileExist'   =  PathIO.doesFileExist . unPath
 --    getPermissions' = P.getPermissions
+
+    renameFile' old new = do  -- :: fp -> fp ->  ErrIO Text
+    -- ^ rename directory old to new
+        PathIO.renameFile (unPath old) (unPath new)
 
     getMD5 fp = getMD5 (unL fp)
 -- use listDir which separats result in dir and file list and does not include . and ..

@@ -65,7 +65,7 @@ class DirOps fp where
     createDirIfMissing' :: fp ->  ErrIO ()
     -- | creates the directory, if missing, recursive for path
     -- noop if dir exist
-    renameDir' :: fp -> fp ->  ErrIO Text
+    renameDir' :: fp -> fp ->  ErrIO ()
     -- ^ rename directory old to new
     -- signals: getFileStatus: does not exist (No such file or directory)
 
