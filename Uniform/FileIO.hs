@@ -29,8 +29,8 @@ module Uniform.FileIO (
          , module Uniform.FileStrings
          , module Uniform.Piped
          -- from Path.IO
-         , doesFileExist, getAppUserDataDir, renameFile
-         , makeAbsolute
+--         , doesFileExist, getAppUserDataDir, renameFile
+         , makeAbsolute'
 --         , module Path   -- ()exports all instances?
 
 --         , Handle, IOMode (..)
@@ -53,10 +53,11 @@ import           Uniform.Piped
 import           Uniform.TypedFile
 
 import           Uniform.Zero
-import Path.IO (doesFileExist, getAppUserDataDir, renameFile, makeAbsolute)
+import qualified Path.IO (doesFileExist, getAppUserDataDir, renameFile, makeAbsolute)
 import           Path hiding ((</>), (<.>))
 --import           Test.Invariant
 
+makeAbsolute' file = fmap Path $ Path.IO.makeAbsolute file
 
 --instance CharChains2 FilePath Text where
 --    show' = s2t
