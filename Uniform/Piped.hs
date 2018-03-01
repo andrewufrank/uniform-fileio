@@ -5,7 +5,7 @@
 --
 -- | the recursive access to many files not blocking
 -----------------------------------------------------------------------------
-{-# OPTIONS_GHC -F -pgmF htfpp #-}
+--{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE
     MultiParamTypeClasses
 --    , TypeSynonymInstances
@@ -18,9 +18,7 @@
     #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
-module  Uniform.Piped (htf_thisModulesTests
---        pipedDo, pipedDoIO
-            , getRecursiveContents
+module  Uniform.Piped ( getRecursiveContents
 
 
             ) where
@@ -48,7 +46,7 @@ import Uniform.Filenames
 import Data.List (sort)
 import qualified Path.IO  (searchable, readable)
 
-import Test.Framework
+--import Test.Framework
 --import Test.Invariant
 --
 

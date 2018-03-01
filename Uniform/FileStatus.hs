@@ -5,7 +5,7 @@
 --
 -- | the routines to take apart the file status
 -----------------------------------------------------------------------------
-{-# OPTIONS_GHC -F -pgmF htfpp #-}
+--{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE
     MultiParamTypeClasses
     , TypeSynonymInstances
@@ -22,15 +22,8 @@
 
 {-# OPTIONS -w #-}
 
-module Uniform.FileStatus ( htf_thisModulesTests
-
---          FileOps (..)
---         ,  FileOps2  (..)
---         , FileOps3 (..)
---        , FileOpsSignals (..)
---        , FilePathes (..)
---        , FilePathes2 (..)
-        , getFileStatus, isDirectory, isRegularFile
+module Uniform.FileStatus (
+         getFileStatus, isDirectory, isRegularFile
         , getFileStatus'
         , isSymbolicLink
 --        , getSymbolicLinkStatusFP
@@ -53,7 +46,7 @@ import Uniform.Zero
 import Uniform.Strings
 import Uniform.Filenames
 
-import Test.Framework
+--import Test.Framework
 
 -- new approach
 
