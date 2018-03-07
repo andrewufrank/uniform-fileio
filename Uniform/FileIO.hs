@@ -21,7 +21,7 @@
 
 module Uniform.FileIO (
         module Uniform.Filenames
-        --  , module Uniform.Error
+--         , module Uniform.Error
         --  , module Uniform.Strings
          , module Uniform.FileStatus
          , module Uniform.FileIOalgebra
