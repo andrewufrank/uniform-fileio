@@ -31,7 +31,7 @@ module Uniform.FileIO (
          -- from Path.IO
 --         , doesFileExist
             ,  getAppUserDataDir'
-            , renameFile'
+--            , renameFile'
          , makeAbsoluteFile'
 --         , module Path   -- ()exports all instances?
 
