@@ -24,7 +24,7 @@ module Uniform.Filenames  (
 --         , module Path
          , module Uniform.Error
          , Abs, Rel, File, Dir
-         , unPath
+--         , unPath
 --         , makeExtension, unExtension
         --  , module Uniform.Strings
 --          , htf_thisModulesTests
@@ -175,6 +175,8 @@ instance Filenames1 (Path ar File)   where
     getNakedFileName =   getNakedFileName . toFilePath
     getImmediateParentDir = getImmediateParentDir . toFilePath
     getParentDir =  getParentDir . toFilePath
+    getNakedDir = error
+        "getNakedDir for Filenamse1 Path ar File) not existing"
 
 instance Filenames1 (Path ar Dir) where
     getNakedDir = getNakedDir . toFilePath
