@@ -93,6 +93,12 @@ test_call_IO_Lp = do
         return False   -- expect that read fials
     assertEqual ( Left "xxxxabcd: openBinaryFile: does not exist (No such file or directory)") res
 
+test_call_NotExist = do
+    res <- runErr $ do
+        f :: Bool <-  doesFileExist' notexisting  -- not existing fileAccess
+        return f
+    assertEqual  (Right False) res
+
 --test_call_IO_Corrupt= do
 --    res <- runErr $ callIO $ do
 --        f :: L.ByteString <-    L.readFile corruptJPG  -- not existing fileAccess

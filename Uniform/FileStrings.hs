@@ -333,6 +333,8 @@ instance FileOps (Path ar File)  where
     -- ^ rename directory old to new
         PathIO.renameFile (unPath old) (unPath new)
 
+    deleteFile f =  deleteFile (unL f)
+
     getMD5 fp = getMD5 (unL fp)
 -- use listDir which separats result in dir and file list and does not include . and ..
 --    getDirCont fn  = do
