@@ -21,23 +21,10 @@
 
 module Uniform.Filenames  (
          module Uniform.Filenames
---         , module Path
          , module Uniform.Error
          , Abs, Rel, File, Dir
---         , unPath
---         , makeExtension, unExtension
-        --  , module Uniform.Strings
---          , htf_thisModulesTests
              ) where
---
----- using uniform:
 import           Uniform.Error hiding ((</>), (<.>))
--- import           Uniform.Strings     hiding ((</>), (<.>))
-            -- (s2t, showT, t2s, removeChar, CharChains2 (..), Text)
---import Safe   -- todo error
---import Path   hiding ( (</>), (<.>) ) -- should I hide the quasi quoters?
---import qualified Path   ((</>))
---import qualified          System.Posix.FilePath as P
 import qualified Path.IO as PathIO
 import qualified Path  as Path
 import Path (Abs, Rel, File, Dir)
@@ -49,10 +36,8 @@ import qualified Data.List.Split          as Sp
 -- not usable, has a different definition of FilePath
 
 
---homeDir = Path.IO.getHomeDir :: Monad?? (Path Abs Dir
 homeDir =  makeAbsDir "/home/frank/":: Path Abs Dir
---    where
---        callIO $ S.getHomeDirectory  -- will require IO
+homeDir2 = fmap Path $ callIO $ PathIO.getHomeDir  ::ErrIO (Path Abs Dir)
 
 newtype Path b t = Path (Path.Path b t)
 -- in Path: newtype   Path b t = Path FilePath
@@ -69,13 +54,18 @@ makeRelDir :: FilePath -> Path Rel Dir
 makeAbsFile :: FilePath -> Path Abs File
 makeAbsDir :: FilePath -> Path Abs Dir
 
-makeRelFile fn = Path . fromJustNote ("makeRelFile " ++ fn) $ Path.parseRelFile fn
-makeRelDir fn = Path . fromJustNote ("makeRelDir " ++ fn) $ Path.parseRelDir fn
-makeAbsFile fn = Path . fromJustNote ("makeAbsFile " ++ fn) $ Path.parseAbsFile fn
-makeAbsDir fn = Path . fromJustNote ("makeAbsDir " ++ fn) $ Path.parseAbsDir fn
+makeRelFile fn = Path . fromJustNote ("makeRelFile " ++ fn)
+                        $ Path.parseRelFile fn
+makeRelDir fn = Path . fromJustNote ("makeRelDir " ++ fn)
+                        $ Path.parseRelDir fn
+makeAbsFile fn = Path . fromJustNote ("makeAbsFile " ++ fn)
+                        $ Path.parseAbsFile fn
+makeAbsDir fn = Path . fromJustNote ("makeAbsDir " ++ fn)
+                        $ Path.parseAbsDir fn
 
 toShortFilePath :: Path df ar -> FilePath
----- ^ get the filepath, but without the trailing separator, necessary for systemcalls
+---- ^ get the filepath, but without the trailing separator
+--    , necessary for systemcalls
 toShortFilePath = S.dropTrailingPathSeparator . Path.toFilePath . unPath
 
 instance IsString (Path Abs File) where
@@ -88,18 +78,22 @@ instance IsString (Path Rel Dir) where
     fromString = read
 
 instance Read (Path Abs Dir) where
-        readsPrec i r =   maybe []  (\res -> [(Path res, rem1)] ) $ Path.parseAbsDir x
+        readsPrec i r =   maybe []  (\res -> [(Path res, rem1)] )
+                $ Path.parseAbsDir x
                 where  [(x ::String , rem1)] = readsPrec i r
 instance Read (Path Abs File) where
-        readsPrec i r =  maybe []  (\res -> [(Path res, rem1)] ) $ Path.parseAbsFile x
+        readsPrec i r =  maybe []  (\res -> [(Path res, rem1)] )
+                $ Path.parseAbsFile x
                 where  [(x ::String , rem1)] = readsPrec i r
 --                       mres = parseAbsFile x :: Maybe (Path Abs File)
 
 instance Read (Path Rel Dir) where
-        readsPrec i r =  maybe []  (\res -> [(Path res, rem1)] ) $ Path.parseRelDir x
+        readsPrec i r =  maybe []  (\res -> [(Path res, rem1)] )
+                $ Path.parseRelDir x
                 where  [(x ::String , rem1)] = readsPrec i r
 instance Read (Path Rel File) where
-        readsPrec i r =  maybe []  (\res -> [(Path res, rem1)] ) $ Path.parseRelFile x
+        readsPrec i r =  maybe []  (\res -> [(Path res, rem1)] )
+                $ Path.parseRelFile x
                 where  [(x ::String , rem1)] = readsPrec i r
 
 
@@ -150,8 +144,10 @@ instance Filenames (Path ar File) (Path Rel File) where
 
 instance Filenames3 (Path b Dir) FilePath  where
     type FileResultT (Path b Dir) FilePath = (Path b File)
-    addFileName p  d =  Path $ if null' d then error ("addFileName with empty file" ++ d)
-                                    else (Path.</>) (unPath p) (unPath d2)
+    addFileName p  d =
+                Path $ if null' d
+                    then error ("addFileName with empty file" ++ d)
+                    else (Path.</>) (unPath p) (unPath d2)
         where
             d2 = makeRelFile d :: Path Rel File
 
@@ -220,8 +216,10 @@ instance Extensions FilePath  where
 instance Extensions (Path ar File) where
     type ExtensionType (Path ar File) = Extension
 
-    getExtension f = Extension . removeChar '.' . Path.fileExtension . unPath $ f
-    setExtension e f = Path $ fromJustNote "setExtension" $ Path.setFileExtension
+    getExtension f = Extension . removeChar '.'
+                    . Path.fileExtension . unPath $ f
+    setExtension e f = Path $ fromJustNote "setExtension"
+                    $ Path.setFileExtension
                     (unExtension e) (unPath f)
     addExtension e   =  setExtension ( e)
     removeExtension   =  setExtension (Extension "")
