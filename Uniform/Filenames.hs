@@ -38,6 +38,7 @@ import qualified Data.List.Split          as Sp
 
 homeDir =  makeAbsDir "/home/frank/":: Path Abs Dir
 homeDir2 = fmap Path $ callIO $ PathIO.getHomeDir  ::ErrIO (Path Abs Dir)
+-- replace homeDir with homeDir2 - is user independent but requires IO
 
 newtype Path b t = Path (Path.Path b t)
 -- in Path: newtype   Path b t = Path FilePath
