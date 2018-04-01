@@ -4,7 +4,7 @@
 -- Copyright   :  andrew u frank -
 --
 -- | the operations on filenames and extensions
---  uses the Path library
+--  uses the Path library, but wraps it in Path (to construct a read)
 -- is a class except for the make
 
 
@@ -16,7 +16,9 @@
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
-{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE OverloadedStrings
+        , DeriveGeneric
+        , DeriveAnyClass  #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.Filenames  (
@@ -25,6 +27,8 @@ module Uniform.Filenames  (
          , Abs, Rel, File, Dir
              ) where
 import           Uniform.Error hiding ((</>), (<.>))
+import Uniform.Zero -- for Generics
+
 import qualified Path.IO as PathIO
 import qualified Path  as Path
 import Path (Abs, Rel, File, Dir)
@@ -43,9 +47,15 @@ homeDir2 = fmap Path $ callIO $ PathIO.getHomeDir  ::ErrIO (Path Abs Dir)
 newtype Path b t = Path (Path.Path b t)
 -- in Path: newtype   Path b t = Path FilePath
 -- should this be used
-  deriving (Ord, Eq)
+  deriving (Ord, Eq, Generic)
+  -- read and show is defined separately
+  -- unclear what zero should be ?
+instance Zeros (Path Abs File) where  -- required for NTdescriptor
+    zero = makeAbsFile ""
+
 unPath (Path s) = s
 toFilePath = Path.toFilePath . unPath
+
 
 instance Show (Path b t) where
   show = show . Path.toFilePath . unPath
