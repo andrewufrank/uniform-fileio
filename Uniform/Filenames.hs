@@ -18,7 +18,8 @@
 {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE OverloadedStrings
         , DeriveGeneric
-        , DeriveAnyClass  #-}
+        -- , DeriveAnyClass 
+         #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.Filenames  (
@@ -50,8 +51,11 @@ newtype Path b t = Path (Path.Path b t)
   deriving (Ord, Eq, Generic)
   -- read and show is defined separately
   -- unclear what zero should be ?
+
 instance Zeros (Path Abs File) where  -- required for NTdescriptor
-    zero = makeAbsFile ""
+  zero = makeAbsFile ""
+instance Zeros (Path Rel File) where  -- required for NTdescriptor
+  zero = makeRelFile ""
 
 unPath (Path s) = s
 toFilePath = Path.toFilePath . unPath
@@ -148,7 +152,7 @@ instance Filenames FilePath FilePath where
     getFileName = snd . S.splitFileName
 instance Filenames3 FilePath FilePath  where
     type FileResultT FilePath FilePath = FilePath
-    addFileName p  d  = S.combine p d
+    addFileName  = S.combine
 
 instance Filenames (Path ar File) (Path Rel File) where
     getFileName = Path . Path.filename . unPath
@@ -232,7 +236,7 @@ instance Extensions (Path ar File) where
     setExtension e f = Path $ fromJustNote "setExtension"
                     $ Path.setFileExtension
                     (unExtension e) (unPath f)
-    addExtension e   =  setExtension ( e)
+    addExtension   =  setExtension
     removeExtension   =  setExtension (Extension "")
 --    hasExtension e f = (e==). getExtension
 
