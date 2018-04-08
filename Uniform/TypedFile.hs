@@ -37,6 +37,12 @@ class (FileHandles a) =>
 -- the first parameter is the type of file, the second an arbitrary differentiation
 -- to allow two file types with different extension and read
 -- the b can be () if no differentiation is desired
+    append5 f = errorT ["TypedFiles - no implementation for append5", showT f]
+    read5 f = errorT ["TypedFiles - no implementation for read5", showT f]
+    openHandle6 f = errorT ["TypedFiles - no implementation for openHandle6", showT f]
+    writeHandle6 f = errorT ["TypedFiles - no implementation for writeHandle6", showT f]
+    closeHandle6  f = errorT ["TypedFiles - no implementation for closeHandle6", showT f]
+
 
 --    mkTypedFile5  :: TypedFile5 a b
     -- no argument, the extension is encapsulated in instance def
