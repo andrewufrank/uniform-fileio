@@ -2,16 +2,18 @@ name:         uniform-fileio
 version:      0.0.16
 license:      GPL
 license-file: GPL_3
-maintainer:   Andrew U. Frank <andrewufrank@gmail.com>
+maintainer:   Andrew U. Frank <andrewufrank@geoinfo.tuwien.ac.at>
 author:       Andrew Frank
 copyright:    2021 Andrew U. Frank
 category:     Data Text 
 synopsis: uniform file handling operations
-description: reduce complexity of Haskell by providing a set of uniformly named
-    operations to handle files with an uniform handling of error
+description: |
+  uniform operations for handling files and file path names
+  independent from the representation. 
 
-
-
+  Additionally, functions to read and write files for specific 
+  typed content (marked by extension).
+   
 extra-source-files:
 - README.md
 - ChangeLog.md
@@ -66,6 +68,9 @@ dependencies:
 library:
   source-dirs: 
     - .
+  verbatim:
+    autogen-modules:
+        Paths_uniform_fileio
 
 # this is only a library, no directly executable
 # executables:
@@ -81,8 +86,8 @@ library:
 
 tests:
   strings-test:
-    main:                Spec.hs
-    source-dirs:         test
+    main:                Testing.hs
+    source-dirs:         tests
     ghc-options:
     - -threaded
     - -rtsopts

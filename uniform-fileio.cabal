@@ -4,15 +4,20 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a3ded19d1a0cd1b2398c87cf19b72102d32b001d4934fa0e181ff138ab277a00
+-- hash: c4bbe45283f0813050d9766b102600ae13a18b8be5e149a7fb6b6a0d25ca2583
 
 name:           uniform-fileio
 version:        0.0.16
 synopsis:       uniform file handling operations
-description:    reduce complexity of Haskell by providing a set of uniformly named operations to handle files with an uniform handling of error
+description:    uniform operations for handling files and file path names
+                independent from the representation. 
+                .
+                Additionally, functions to read and write files for specific 
+                typed content (marked by extension).
+                .
 category:       Data Text
 author:         Andrew Frank
-maintainer:     Andrew U. Frank <andrewufrank@gmail.com>
+maintainer:     Andrew U. Frank <andrewufrank@geoinfo.tuwien.ac.at>
 copyright:      2021 Andrew U. Frank
 license:        GPL
 license-file:   GPL_3
@@ -56,17 +61,12 @@ library
     , unix
     , zlib
   default-language: Haskell2010
+  autogen-modules: Paths_uniform_fileio
 
 test-suite strings-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Uniform.Filenames_test
-      Uniform.FileStatus_test
-      Uniform.FileStrings_test
-      Uniform.PathShowCase_test
-      Uniform.Piped_test
-      Uniform.TypedFile_test
       Paths_uniform_fileio
   hs-source-dirs:
       test
