@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c4bbe45283f0813050d9766b102600ae13a18b8be5e149a7fb6b6a0d25ca2583
+-- hash: bf8e5ba66608562293ca4c9c231c8f59fd8847677be699987bd46e615b95524d
 
 name:           uniform-fileio
 version:        0.0.16
@@ -65,11 +65,17 @@ library
 
 test-suite strings-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Testing.hs
   other-modules:
+      Uniform.Filenames_test
+      Uniform.FileStatus_test
+      Uniform.FileStrings_test
+      Uniform.PathShowCase_test
+      Uniform.Piped_test
+      Uniform.TypedFile_test
       Paths_uniform_fileio
   hs-source-dirs:
-      test
+      tests
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HTF

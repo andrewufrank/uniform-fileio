@@ -1,4 +1,4 @@
------------------------------------------------------------------------------
+----------------------------------------------------------------------
 --
 -- Module      :  FileIO
 -- Copyright   :  andrew u frank -
@@ -9,7 +9,8 @@
 -- uses the Path and Path.IO framework
 
 -- this is the general export
------------------------------------------------------------------------------
+-- and functions which were added and not yet systematized
+----------------------------------------------------------------------
 --{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}

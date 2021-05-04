@@ -3,7 +3,7 @@
 -- Module      :  uniform-FileIO
 -- Copyright   :  andrew u frank -
 --
--- | the routines to take apart the file status
+
 -----------------------------------------------------------------------------
 --{-# OPTIONS_GHC -F -pgmF htfpp #-}
 {-# LANGUAGE
@@ -22,29 +22,36 @@
 
 {-# OPTIONS -w #-}
 
-module Uniform.FileStatus (
-         getFileStatus, isDirectory, isRegularFile
-        , getFileStatus'
-        , isSymbolicLink
---        , getSymbolicLinkStatusFP
---        , createSymbolicLink, renameLink
---        , doesExist
-        , getModificationTimeFromStatus  -- TODO is this correct export?
-        , getFileSize
-        , P.EpochTime, P.FileStatus
---        , getSymbolicLinkStatusX
-                   ) where
+-- | the routines to take apart the file status
+module Uniform.FileStatus
+  ( getFileStatus,
+    isDirectory,
+    isRegularFile,
+    getFileStatus',
+    isSymbolicLink,
+    --        , getSymbolicLinkStatusFP
+    --        , createSymbolicLink, renameLink
+    --        , doesExist
+    getModificationTimeFromStatus, -- TODO is this correct export?
+    getFileSize,
+    P.EpochTime,
+    P.FileStatus,
+    --        , getSymbolicLinkStatusX
+  )
+where
 
 --import qualified Data.Text as T
 --import Path
 --import Path.IO
-import qualified System.Posix as P
+
 import qualified System.Directory as S
+import qualified System.Posix as P
 ----import Basics
 import Uniform.Error
-import Uniform.Zero
-import Uniform.Strings
 import Uniform.Filenames
+import Uniform.Strings
+import Uniform.Zero
+
 -- import Uniform.PathWrapper -- read and show for Path
 
 --import Test.Framework
@@ -70,28 +77,31 @@ unL = toShortFilePath
 --getFileStatus :: Path df ra -> ErrIO P.FileStatus
 getFileStatus fp = callIO $ P.getFileStatus . unL $ fp
 
-getFileStatus' :: FilePath  -> ErrIO P.FileStatus
-getFileStatus' fp = callIO $ P.getFileStatus   fp
-
+getFileStatus' :: FilePath -> ErrIO P.FileStatus
+getFileStatus' fp = callIO $ P.getFileStatus fp
 
 isRegularFile :: P.FileStatus -> Bool
 isRegularFile = P.isRegularFile
+
 isDirectory :: P.FileStatus -> Bool
 isDirectory = P.isDirectory
+
 isSymbolicLink :: P.FileStatus -> Bool
 isSymbolicLink = P.isSymbolicLink
+
 getModificationTimeFromStatus :: P.FileStatus -> P.EpochTime
 getModificationTimeFromStatus = P.modificationTime
+
 getFileSize = P.fileSize
 
-createSymbolicLink :: Show (Path df ra) => Path df ra -> Path df ra-> ErrIO ()
+createSymbolicLink :: Show (Path df ra) => Path df ra -> Path df ra -> ErrIO ()
 createSymbolicLink fn tn = do
-    putIOwords ["createSymbolidLink", showT fn , "to", showT tn]
-    callIO $ P.createSymbolicLink (unL fn) (unL tn)
+  putIOwords ["createSymbolidLink", showT fn, "to", showT tn]
+  callIO $ P.createSymbolicLink (unL fn) (unL tn)
 
-
-renameLink :: Path df ra  -> Path df ra  -> ErrIO ()
+renameLink :: Path df ra -> Path df ra -> ErrIO ()
 renameLink old new = callIO $ P.rename (unL old) (unL new)
+
 -- should check that this is a link and existing etc.
 
 --doesExist :: Path df ra  -> ErrIO Bool
@@ -104,16 +114,10 @@ renameLink old new = callIO $ P.rename (unL old) (unL new)
 --    return (f || d || s)
 --  where fp = unL lfp
 
-
 ----from fay
 ---- | Join for Maybe.
 --joinMaybe :: Maybe (Maybe a) -> Maybe a
 --joinMaybe (Just (Just x)) = Just x
 --joinMaybe _ = Nothing
 
-
-
 --
-
-
-
