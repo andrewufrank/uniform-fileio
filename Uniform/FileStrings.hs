@@ -1,44 +1,36 @@
-------------------------------------------------------------------------------
---
+---------------------------------------------------------------------
 -- Module      :  FileIO.Strings
 --
------------------------------------------------------------------------------
+----------------------------------------------------------------------
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
--- {-# LANGUAGE TypeSynonymInstances  #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
--- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
-{-# OPTIONS -w #-}
-
--- | the instance for strings (was in 0.1.1)
--- filenames are Path
--- should only export the instances
--- removed -- file content can be lazy bytestring
 module Uniform.FileStrings
-  ( module Uniform.Filenames, -- exports Path
+  ( module Uniform.Filenames,
     module Uniform.FileIOalgebra,
-    SIO.IOMode (..), -- from System.IO
+    SIO.IOMode (..),
     closeFile2,
     listDir',
     TIO.hGetLine,
-    TIO.hPutStr, -- for other implementations of FileHandle
+    TIO.hPutStr,
   )
 where
 
--- import           Uniform.Strings hiding ((<.>), (</>))
-
--- for fileAccess
 import Control.Arrow (first, second)
 import Control.DeepSeq (force, ($!!))
 import Control.Exception (SomeException, catch)
 import Control.Monad (filterM)
 import Control.Monad.Catch as Catch
-import Control.Monad.IO.Class
+  ( Exception,
+    MonadThrow,
+    SomeException,
+  )
+import Control.Monad.IO.Class (MonadIO (..))
 import qualified Data.ByteString as BS (readFile, writeFile)
 import qualified Data.ByteString.Lazy as L
 import Data.Digest.Pure.MD5 (md5)
@@ -47,7 +39,7 @@ import Data.List (isPrefixOf)
 import Data.Maybe (catMaybes)
 import qualified Data.Text.IO as T (appendFile, readFile, writeFile)
 import qualified Data.Text.IO as TIO (hGetLine, hPutStr)
-import qualified Path as Path
+import qualified Path
 import qualified Path.IO as PathIO
 import qualified System.Directory as D
 import qualified System.FilePath as OS
@@ -57,7 +49,7 @@ import qualified System.Posix as Posix
 import Uniform.FileIOalgebra
 import Uniform.FileStatus
 import Uniform.Filenames
-import Uniform.Filenames as FN
+import Uniform.Filenames as FN (toFilePath)
 
 closeFile2 :: SIO.Handle -> ErrIO ()
 -- close a handle, does not need a filepath
@@ -93,8 +85,6 @@ listDir' p = do
   let abPathList = abList
   return abPathList
 
--- would require a class and an implementation for FilePath
-
 instance FileSystemOps FilePath where
   checkSymbolicLink fp = callIO $ D.pathIsSymbolicLink fp
   getPermissions' = callIO . D.getPermissions
@@ -102,8 +92,6 @@ instance FileSystemOps FilePath where
 instance DirOps FilePath where
   doesDirExist' = callIO . D.doesDirectoryExist
   createDirIfMissing' = callIO . D.createDirectoryIfMissing True
-
-  -- creates recusrively up
 
   createDir' = callIO . D.createDirectory
   renameDir' old new = do
@@ -113,22 +101,17 @@ instance DirOps FilePath where
     if testTarget
       then
         throwErrorT
-          --                signalf  TargetExist
           [showT new]
       else
         if not testSource
           then
             throwErrorT
-              --                    signalf  SourceExist
               [showT old]
           else do
             callIO $ putStrLn "renamed"
             r <- callIO $ D.renameDirectory old new
             return ()
 
-  --                     $ unwordsT
-  --                        [ "renamed dir from ", showT old
-  --                            , " to " , showT  new]
   getDirectoryDirs' dir = filterM f =<< getDirCont dir
     where
       f = doesDirExist'
@@ -144,26 +127,14 @@ instance DirOps FilePath where
 
         putIOwords ["deleted", showT f]
 
--- return ()
-
 instance FileOps FilePath where
   doesFileExist' = callIO . D.doesFileExist
-
-  --    getPermissions' = callIO . D.getPermissions
-
-  --    createDir fp = do
-  --        t <- doesFileOrDirExist fp
-  --        if not t then  callIO $ D.createDirectory   fp
-  --            else throwErrorT
-  --                ["File or Dir exists", showT fp]
-
-  --    createDirIfMissing = callIO . D.createDirectoryIfMissing True
 
   copyOneFile old new = do
     -- source must exist, target must not exist
     t <- doesFileExist' old
     t2 <- doesFileExist' new
-    if t && (not t2)
+    if t && not t2
       then do
         let dir = getParentDir new -- was takeDir
         direxist <- doesDirExist' dir
@@ -175,18 +146,15 @@ instance FileOps FilePath where
           then
             throwErrorT
               ["copyFile source not exist", showT old]
-          else -- signalf   SourceNotExist
-
+          else
             if t2
               then
                 throwErrorT
                   ["copyFile target exist", showT new]
-              else --   signalf  TargetExist
-                throwErrorT ["copyOneFile", "other error"]
+              else throwErrorT ["copyOneFile", "other error"]
   copyOneFileOver old new = do
     -- may overwrite existing target
     t <- doesFileExist' old
-    -- t2 <- doesFileExist' new
     if t
       then do
         let dir = getParentDir new -- was takeDir
@@ -197,106 +165,40 @@ instance FileOps FilePath where
       else -- not t - not existing source
         throwErrorT ["copyFileOver source not exist", showT old]
 
-  -- signalf   SourceNotExist
-
-  --    renameFile old new = do
-  --        t <- doesFileExist old
-  --        t2 <- doesFileExist new
-  --        if t && (not t2)
-  --            then do
-  --                let dir = takeDir new
-  --                direxist <- doesDirExist  dir
-  --                unless direxist $ do
-  --                    createDirIfMissing  dir
-  --                callIO $ D.renameFile ( old) ( new)
-  --
-  --            else if not t
-  --                then  throwErrorT
-  ----                signalf   SourceNotExist
-  --                            ["renameFile source not exist", showT old]
-  --                else throwErrorT
-  ----                            signalf  TargetExist
-  --                                 ["renameFile target exist", showT new]
-
   getMD5 fn =
     do
-      --            putIOwords ["getMD5 in FileStrings.hs", showT fn]
       status <- getSymbolicLinkStatus fn
-      --            let status = fromJustNote "getMD5 xx33" $ mstatus
       let regular = isRegularFile status
       readable <- getFileAccess fn (True, False, False)
-      --            putIOwords ["getMD5 in FileStrings.hs before if"]
       if regular && readable
         then callIO $ do
-          --                    putIOwords ["getMD5 in FileStrings.hs file 1"]
-          filedata :: L.ByteString <- L.readFile fn -- fails for some special files eg. /proc
-          --                    putIOwords ["getMD5 in FileStrings.hs file 2"]
+          filedata :: L.ByteString <- L.readFile fn
           let res = showT $ md5 filedata
-          --                    putIOwords ["getMD5 in FileStrings.hs file 3"]
           return $!! (Just res)
-        else --                   `catch` \(e::SomeException) -> do
-        --                            putIOwords ["caught with catch in getmd5 ", showT e]
-        --                            return Nothing
-
-          throwErrorT $ ["getMD5 error file not readable", showT fn]
+        else throwErrorT ["getMD5 error file not readable", showT fn]
       `catchError` \e -> do
-        putIOwords ["getMD5 in FileStrings.hs", showT fn, showT e] -- reached
-        throwErrorT $ ["getMD5 error for", showT fn]
+        putIOwords ["getMD5 in FileStrings.hs", showT fn, showT e]
+
+        throwErrorT ["getMD5 error for", showT fn]
 
   getDirCont fn = getDirContAll True fn
 
-  -- get all content in a directory
-
   getDirContNonHidden fp = do
-    --        putIOwords ["getDirContentNonHidden", s2t fp]
     r <- getDirContAll False fp
-    -- let r2 = filter (not . isHidden) r
-    ----        r2 <- callIO $ D.listDirectory (unL fp)
-    ----          would be possible but filter here is simpler
-    ----        let r2 = filter ( \file' -> (file' /= "." && file' /= "..")  ) r
-    ----        let r2 = filter (not . isPrefixOf "." ) r
-    ----        putIOwords ["nonhidden files", show r2]
     return r
 
-  -- where
-  --     isHidden = isPrefixOf "."
-
   deleteFile f = do
-    --  putIOwords ["delete file ", showT f]
     callIO . D.removeFile $ f
 
   getAppConfigDirectory = error "not implemented" -- do
-  --        let prefsfileDir = ".config"
-  --        homeDir <- callIO $ D.getHomeDirectory
-  --        return  (homeDir </> prefsfileDir)
 
-  --    getSymbolicLinkStatus :: fp ->   ErrIO (Maybe P.FileStatus)
   getSymbolicLinkStatus fp = do
-    --    putIOwords ["fileio getSymbolicLinkStatus", fp]
     st <- callIO $ Posix.getSymbolicLinkStatus fp
-    --    putIOwords ["fileio getSymbolicLinkStatus done", fp]
-    return $ st
-    --          `catchError` (\s -> do
-    --                    putIOwords ["fileio getSymbolicLinkStatus not found", showT fp]
-    --                    return Nothing)
+    return st
 
   getFileAccess fp (r, w, e) =
     callIO $
       Posix.fileAccess fp r w e
-
-  --              `catchError` \e -> do
-  --                     putIOwords ["getFileAccess error", showT fp, s2t $ show e]
-  --                     return False
-
-  -- fails if broken symbolic link?
-
-  --    isFileAbeforeB fpa fpb = do
-  --        statA :: P.FileStatus <- getFileStatus' fpa
-  --        statB <- getFileStatus' fpb
-  --        let
-  --            timea = getModificationTimeFromStatus statA
-  --            timeb = getModificationTimeFromStatus statB
-  --        return $ timea < timeb
 
   getFileModificationTime fp = do
     stat :: Posix.FileStatus <- getFileStatus' fp
@@ -306,26 +208,19 @@ instance FileOps FilePath where
   openFile2handle fp mode =
     callIO $ SIO.openFile fp mode
 
---        `catchError` \e -> do
--- most likely the dir does not exist.
--- try to create the file?
---    closeFile _ handle = callIO $ SIO.hClose handle
-
 getDirContAll hiddenFlag fn = do
   -- the hiddenFlag must be true to include them
-  --        putIOwords ["getDirCont", show f]
   testDir <- doesDirExist' fn
   readExec <- getFileAccess fn (True, False, True)
   if testDir && readExec
     then do
       r <- callIO . D.listDirectory $ fn
-      let r2 = filter (\file' -> (file' /= "." && file' /= "..")) r
+      let r2 = filter (\file' -> file' /= "." && file' /= "..") r
       let r3 =
             if hiddenFlag
               then r2
               else filter (not . isPrefixOf ".") r2
       let r4 = map (fn </>) r3
-      --               putIOwords ["FileStrigs - getDirCont", showT fn, "files: ", unwordsT . map showT $ r4]
       return r4
     else
       throwErrorT
@@ -335,9 +230,6 @@ getDirContAll hiddenFlag fn = do
           showT readExec
         ]
 
---unL = t2s . filepath2text lpX
---mkL = mkFilepath lpX . s2t
-
 instance FileSystemOps (Path ar df) where
   getPermissions' = PathIO.getPermissions . unPath
   checkSymbolicLink fp = callIO $ D.pathIsSymbolicLink (unL fp)
@@ -345,23 +237,12 @@ instance FileSystemOps (Path ar df) where
 instance DirOps (Path Abs Dir) where
   doesDirExist' = PathIO.doesDirExist
 
-  --    getDirPermissions = P.getPermissions
   createDir' = PathIO.createDir . unPath
 
-  --        do
-  --        t <- doesFileOrDirExist fp
-  --        if not t then  callIO $ D.createDirectory . unL $ fp
-  --            else throwErrorT
-  --                ["File or Dir exists", showT fp]
-
-  --  rename directory old to new
   renameDir' old new =
     -- :: fp -> fp ->  ErrIO Text
     PathIO.renameDir (unPath old) (unPath new)
 
-  --        return $ unwordsT
-  --                        [ "renamed dir from ", showT old
-  --                            , " to " , showT  new]
   getDirectoryDirs' dir = do
     res <- filterM f =<< getDirCont (toFilePath dir)
     return . map makeAbsDir $ res
@@ -382,22 +263,11 @@ instance DirOps (Path Abs Dir) where
 instance DirOps (Path Rel Dir) where
   doesDirExist' = PathIO.doesDirExist
 
-  --    getDirPermissions = P.getPermissions
   createDir' = PathIO.createDir . unPath
 
-  --        do
-  --        t <- doesFileOrDirExist fp
-  --        if not t then  callIO $ D.createDirectory . unL $ fp
-  --            else throwErrorT
-  --                ["File or Dir exists", showT fp]
   renameDir' old new =
-    -- :: fp -> fp ->  ErrIO Text
-    --  rename directory old to new
     PathIO.renameDir (unPath old) (unPath new)
 
-  --        return $ unwordsT
-  --                        [ "renamed dir from ", showT old
-  --                            , " to " , showT  new]
   getDirectoryDirs' dir = do
     res <- filterM f =<< getDirCont (toFilePath dir)
     return . map makeRelDir $ res
@@ -419,12 +289,9 @@ instance DirOps (Path Rel Dir) where
 instance (Show (Path ar File)) => FileOps (Path ar File) where
   doesFileExist' = PathIO.doesFileExist . unPath
 
-  --    getPermissions' = P.getPermissions
   copyOneFile old new = copyOneFile (unL old) (unL new)
   copyOneFileOver old new = copyOneFileOver (unL old) (unL new)
   renameOneFile old new =
-    -- :: fp -> fp ->  ErrIO Text
-    --  rename directory old to new
     PathIO.renameFile (unPath old) (unPath new)
 
   deleteFile f = deleteFile (unL f)
@@ -436,25 +303,12 @@ instance (Show (Path ar File)) => FileOps (Path ar File) where
   getDirContNonHidden fp =
     error "getDirContentNonHidden cannot be implemented for Path"
 
-  --    isFileAbeforeB fpa fpb = do
-  --        statA :: P.FileStatus <- getFileStatus fpa
-  --        statB <- getFileStatus fpb
-  --        let
-  --            timea = getModificationTimeFromStatus statA
-  --            timeb = getModificationTimeFromStatus statB
-  --        return $ timea < timeb
-
   getFileModificationTime fp = getFileModificationTime (unL fp)
 
   openFile2handle fp mode = openFile2handle (unL fp) mode
 
-  --    closeFile fp handle = closeFile (unL fp) handle
-
-  --    checkSymbolicLink fp =   callIO $ D.pathIsSymbolicLink (unL fp)
-
   getFileAccess fp (r, w, e) =
-    --            putIOwords ["getFileAccess", show fp]
-    callIO $
+    callIO
       ( do
           Posix.fileAccess (unL fp) r w e
           `catchError` \e -> do
@@ -482,20 +336,12 @@ instance (Show (Path ar File)) => FileOps2 (Path ar File) String where
 instance (Show (Path ar File)) => FileOps2 (Path ar File) Text where
   readFile2 fp = readFile2 (unL fp)
 
-  -- a strict read (does cloes?)
-  -- deal with latin encoded files - gives hGet error otherwise!
   writeFile2 fp st = writeFile2 (unL fp) st
   appendFile2 fp st = appendFile2 (unL fp) st
 
   writeFileOrCreate2 filepath st = do
     let dir = getParentDir filepath
-    --        let (dir, fn, ext) = splitFilepath filepath
-    --        writeFileCreateDir dir fn st
-    --                  writeFileCreateDir dirpath filename st = do
-    --        let fp = dirpath `combine` filename
-    --        d <- doesDirExist' dir
-    --        --        f <- doesFileExist fp --
-    --        unless d $
+
     createDirIfMissing' dir
     when False $ putIOwords ["writeFileOrCreate2 dir created", showT dir]
     t <- doesDirExist' dir
@@ -523,12 +369,9 @@ instance FileOps2a FilePath FilePath where
     filterM doesFileExist'
       =<< getDirCont dir
 
-  -- where f =  doesFileExist'
   getDirContentNonHiddenFiles dir =
     filterM doesFileExist'
       =<< getDirContNonHidden dir
-
--- where f =  doesFileExist'
 
 instance FileOps2a (Path Abs Dir) (Path Abs File) where
   getDirContentFiles dir = do
@@ -545,15 +388,3 @@ instance FileOps2a (Path Rel Dir) (Path Rel File) where
   getDirContentNonHiddenFiles dir = do
     res <- getDirContentNonHiddenFiles (toFilePath dir)
     return (map makeRelFile res)
-
---bracket2
---        :: IO a         -- ^ computation to run first (\"acquire resource\")
---        -> (a -> IO b)  -- ^ computation to run last (\"release resource\")
---        -> (a -> IO c)  -- ^ computation to run in-between
---        -> IO c         -- returns the value from the in-between computation
---bracket before after thing =
---  Catch.mask $ \restore -> do
---    a <- before
---    r <- restore (thing a) `onException` after a
---    _ <- after a
---    return r

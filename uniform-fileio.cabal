@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bf8e5ba66608562293ca4c9c231c8f59fd8847677be699987bd46e615b95524d
+-- hash: bd1cc0d02842c95d40742dbdcb04fbac893620a5d74d905025a22423ec088075
 
 name:           uniform-fileio
 version:        0.0.16
@@ -33,7 +33,6 @@ library
       Uniform.Filenames
       Uniform.FileStatus
       Uniform.FileStrings
-      Uniform.PathShowCase
       Uniform.Piped
       Uniform.TypedFile
   other-modules:
@@ -70,7 +69,6 @@ test-suite strings-test
       Uniform.Filenames_test
       Uniform.FileStatus_test
       Uniform.FileStrings_test
-      Uniform.PathShowCase_test
       Uniform.Piped_test
       Uniform.TypedFile_test
       Paths_uniform_fileio

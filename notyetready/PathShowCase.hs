@@ -30,7 +30,7 @@ readsPrecForPath ::
   [Char] ->
   [(a, [Char])]
 readsPrecForPath parseAD prefix1 msg a0 =
-  if (prefix1 `isPrefixOf'` a1)
+  if prefix1 `isPrefixOf'` a1
     then [(res2, rem2)]
     else error ("not a  prefix for " ++ msg ++ " input " ++ show a1)
   where
@@ -41,7 +41,7 @@ readsPrecForPath parseAD prefix1 msg a0 =
     res1 = parseAD a4 -- there seem not to be a parser for filepath
     res2 = fromJustNote (unwords ["not a path ", msg, "input", show a0]) res1
     terminate :: Char -> Bool
-    terminate c = not (c `elem` [',', '}'])
+    terminate c = c `notElem` [',', '}']
 
 -- add here character to stop reading !!
 

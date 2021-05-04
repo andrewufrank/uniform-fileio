@@ -1,26 +1,14 @@
------------------------------------------------------------------------------
+----------------------------------------------------------------------
 --
 -- Module      :  uniform-FileIO
 -- Copyright   :  andrew u frank -
 --
+----------------------------------------------------------------------
 
------------------------------------------------------------------------------
---{-# OPTIONS_GHC -F -pgmF htfpp #-}
-{-# LANGUAGE
-    MultiParamTypeClasses
-    , TypeSynonymInstances
-    , FlexibleInstances
-    , FlexibleContexts
---    , DeriveFunctor
-    , ScopedTypeVariables
---    , UndecidableInstances
-    , TypeFamilies
-    , OverloadedStrings
-
-    #-}
--- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
-
-{-# OPTIONS -w #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- | the routines to take apart the file status
 module Uniform.FileStatus
@@ -29,52 +17,27 @@ module Uniform.FileStatus
     isRegularFile,
     getFileStatus',
     isSymbolicLink,
-    --        , getSymbolicLinkStatusFP
-    --        , createSymbolicLink, renameLink
-    --        , doesExist
-    getModificationTimeFromStatus, -- TODO is this correct export?
+    getModificationTimeFromStatus,
     getFileSize,
     P.EpochTime,
     P.FileStatus,
-    --        , getSymbolicLinkStatusX
   )
 where
 
---import qualified Data.Text as T
---import Path
---import Path.IO
-
 import qualified System.Directory as S
 import qualified System.Posix as P
-----import Basics
-import Uniform.Error
-import Uniform.Filenames
-import Uniform.Strings
-import Uniform.Zero
+import Uniform.Error (ErrIO, callIO, putIOwords, showT)
+import Uniform.Filenames (Path, toShortFilePath)
+import Uniform.Strings (putIOwords, showT)
 
--- import Uniform.PathWrapper -- read and show for Path
-
---import Test.Framework
-
--- new approach
-
---getSymbolicLinkStatusFP :: FilePath  -> ErrIO ( P.FileStatus)
----- ^ get status if exist (else Nothing)
-----   is the status of the link, does not follow the link
-----
---getSymbolicLinkStatusFP  fp = do
-------    putIOwords ["fileio getSymbolicLinkStatus", fp]
---    st <- callIO $ P.getSymbolicLinkStatus fp
-------    putIOwords ["fileio getSymbolicLinkStatus done", fp]
---    return   st
-----  `catchError` (\s -> do
-----            putIOwords ["fileio getSymbolicLinkStatus not found", showT fp]
-----            return Nothing)
-----  where fp = unL lfp
-
+unL :: Path df ar -> FilePath
 unL = toShortFilePath
 
 --getFileStatus :: Path df ra -> ErrIO P.FileStatus
+-- getFileStatus :: (Control.Monad.Error.Class.MonadError m,
+--  Control.Monad.IO.Class.MonadIO m,
+--  Control.Monad.Error.Class.ErrorType m ~ Data.Text.Internal.Text)
+--     => Path df ar -> m P.FileStatus
 getFileStatus fp = callIO $ P.getFileStatus . unL $ fp
 
 getFileStatus' :: FilePath -> ErrIO P.FileStatus
@@ -101,23 +64,3 @@ createSymbolicLink fn tn = do
 
 renameLink :: Path df ra -> Path df ra -> ErrIO ()
 renameLink old new = callIO $ P.rename (unL old) (unL new)
-
--- should check that this is a link and existing etc.
-
---doesExist :: Path df ra  -> ErrIO Bool
----- ^ test if dir, file or link exist
---doesExist lfp = callIO $ do
---
---    f <- doesFileExist lfp
---    d <- doesDirectoryExist lfp
---    s <- pathIsSymbolicLink lfp
---    return (f || d || s)
---  where fp = unL lfp
-
-----from fay
----- | Join for Maybe.
---joinMaybe :: Maybe (Maybe a) -> Maybe a
---joinMaybe (Just (Just x)) = Just x
---joinMaybe _ = Nothing
-
---

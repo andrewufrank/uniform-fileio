@@ -1,21 +1,14 @@
------------------------------------------------------------------------------
+-------------------------------------------------------------------
 --
 -- Module      :  Filenames
 -- Copyright   :  andrew u frank -
 --
------------------------------------------------------------------------------
---{-# LANGUAGE AllowAmbiguousTypes   #-}
+----------------------------------------------------------------------
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
--- {-# LANGUAGE TypeSynonymInstances  #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
--- {-# LANGUAGE   DeriveGeneric    #-}
-{-# LANGUAGE UndecidableInstances #-}
--- , DeriveAnyClass
--- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 {-# OPTIONS_GHC -Wno-deprecations #-}
 
@@ -25,18 +18,15 @@
 module Uniform.Filenames
   ( module Uniform.Filenames,
     module Uniform.Error,
-    module Uniform.PathShowCase,
     Abs,
     Rel,
     File,
     Dir,
     Path,
     toFilePath,
-    -- , takeBaseName'
   )
 where
 
--- import qualified Data.List.Split               as Sp -- hiding ((</>), (<.>))
 -- for Generics
 import Path
   ( Abs,
@@ -49,28 +39,20 @@ import Path
 import qualified Path
 import qualified Path.IO as PathIO
 import qualified System.FilePath as S
--- import qualified System.FilePath.Posix         as S -- prefered
-import Uniform.Error -- prefered
--- import           Uniform.Zero
---import  qualified         Filesystem.Path       as F -- prefered
--- not usable, has a different definition of FilePath
--- import           Uniform.PathWrapper  -- read and show for Path
-import Uniform.PathShowCase
+import Uniform.Error
 
 takeBaseName' :: FilePath -> FilePath
 takeBaseName' = S.takeBaseName
-
--- toFilePathT = s2t . toFilePath
 
 homeDir :: Path Abs Dir
 homeDir = makeAbsDir "/home/frank/" :: Path Abs Dir
 
 homeDir2 :: ErrIO (Path Abs Dir)
-homeDir2 = callIO $ PathIO.getHomeDir :: ErrIO (Path Abs Dir)
+homeDir2 = callIO PathIO.getHomeDir :: ErrIO (Path Abs Dir)
 
 -- replace homeDir with homeDir2 - is user independent but requires IO
 currentDir :: ErrIO (Path Abs Dir)
-currentDir = callIO $ PathIO.getCurrentDir
+currentDir = callIO PathIO.getCurrentDir
 
 setCurrentDir :: Path Abs Dir -> ErrIO ()
 setCurrentDir path = PathIO.setCurrentDir (unPath path)
@@ -81,36 +63,8 @@ stripProperPrefix' dir fn = Path.stripProperPrefix (unPath dir) (unPath fn)
 stripProperPrefixMaybe :: Path b Dir -> Path b t -> Maybe (Path Rel t)
 stripProperPrefixMaybe dir fn = Path.stripProperPrefix (unPath dir) (unPath fn)
 
--- instance {-# OVERLAPPABLE #-} Show (Path a b) where
---     show a = error "Show (Path a b) - the generic instance must not be used"
-
--- newtype Path b t = Path (Path.Path b t)
--- -- in Path: newtype   Path b t = Path FilePath
--- -- should this be used
---   deriving (Ord, Eq, Generic)
---   -- read and show is defined separately
---   -- unclear what zero should be ?
-
--- instance Zeros (Path Abs File) where  -- required for NTdescriptor
---   zero = makeAbsFile "/zero"
--- instance Zeros (Path Rel File) where  -- required for NTdescriptor
---   zero = makeRelFile "zero"
-
--- instance Zeros (Path Abs Dir) where  -- required for NTdescriptor
---   zero = makeAbsDir "/"
--- instance Zeros (Path Rel Dir) where  -- required for NTdescriptor
---   zero = makeRelDir "."
-
--- instance NiceStrings (Path a b) where
---     shownice = s2t . Path.toFile unPath
-
 unPath :: a -> a
 unPath = id
-
--- toFilePath = Path.toFile unPath
-
--- instance Show (Path b t) where
---   show = show . Path.toFile unPath
 
 makeRelFile :: FilePath -> Path Rel File
 makeRelDir :: FilePath -> Path Rel Dir
@@ -152,19 +106,6 @@ instance Zeros (Path Rel Dir) where
 
 instance Zeros (Path Rel File) where
   zero = makeRelFile "zero"
-
--- instance IsString (Path Abs File) where
---     fromString = read
--- instance IsString (Path Abs Dir) where
---     fromString = read
--- instance IsString (Path Rel File) where
---     fromString = read
--- instance IsString (Path Rel Dir) where
---     fromString = read
--- instance  NiceStrings (Path a b) where
---     shownice = s2t . toFilePath
--- -- instance Show (Path a b) where
--- --     show = toFilePath
 
 newtype Extension = Extension FilePath deriving (Show, Read, Eq, Ord)
 
@@ -219,18 +160,6 @@ class Filenames1 fp where
   getNakedDir :: fp -> FilePath
   -- ^ get the last dir
 
--- class Filenames2 fp where
---     -- instantiate only for filepath TODO do for path
---     getImmediateParentDir2 :: fp -> fp
--- instance Filenames2 FilePath where
---     getImmediateParentDir2 = getImmediateParentDir
-
--- instance Filenames2 (Path Abs Dir) where
---     getImmediateParentDir2 = makeAbsDir . getImmediateParentDir . toFilePath
--- instance Filenames2 (Path Rel Dir) where
---     getImmediateParentDir2 = makeAbsDir . getImmediateParentDir . toFilePath
--- needs also differentiation if the input is a dir or a file
-
 instance Filenames FilePath FilePath where
   getFileName = snd . S.splitFileName
 
@@ -252,7 +181,7 @@ instance Filenames3 (Path b Dir) FilePath where
 
 instance Filenames4 FilePath FilePath where
   type FileResultT4 FilePath FilePath = FilePath
-  addDir p d = if null' d then p else (p </>) d
+  addDir p d = if null' d then p else p </> d
 
 instance Filenames4 (Path b Dir) FilePath where
   type FileResultT4 (Path b Dir) FilePath = (Path b Dir)
@@ -304,10 +233,11 @@ class (Eq (ExtensionType fp)) => Extensions fp where
   hasExtension e = (e ==) . getExtension
 
   prop_add_has :: ExtensionType fp -> fp -> Bool
-  prop_add_has e f = (hasExtension e) (addExtension e f)
+  prop_add_has e f = hasExtension e (addExtension e f)
   prop_add_add_has :: ExtensionType fp -> ExtensionType fp -> fp -> Bool
   prop_add_add_has e1 e2 f =
-    (hasExtension e1)
+    hasExtension
+      e1
       (setExtension e1 . setExtension e2 $ f)
   prop_set_get :: ExtensionType fp -> fp -> Bool
   prop_set_get e f = ((e ==) . getExtension) (setExtension e f)
@@ -335,27 +265,8 @@ instance Extensions (Path ar File) where
 
       e = getExtension . toFilePath $ f
 
-  -- the Path.fileExtension in  path 0.7.0
-  -- throws error when no extension present
-
-  --    e = snd .  Path.splitExtension $  f
-  --         for my version in fromOthersInstalled
-  --               e = headNote "werwqerqw" . Path.fileExtension $ f :: String
-  --         difference in version
-
-  --     setExtension e f =
-  --         fromJustNote "setExtension" $ Path.replaceExtension (unExtension e) f
-  --     addExtension  e f  = fromJustNote "addExtension"
-  --                             $ Path.addExtension ("." ++ unExtension e) f
-  --     removeExtension f = fromJustNote "setFileExtension"
-  --                             $ Path.setFileExtension  "" f
-  -- --    hasExtension e f = (e==). getExtension
-
   setExtension e f =
     fromJustNote "setExtension" $ Path.setFileExtension (unExtension e) f
 
-  -- must remove all existing extension, not add to
   addExtension = setExtension
   removeExtension = setExtension (Extension "")
-
---    hasExtension e f = (e==). getExtension

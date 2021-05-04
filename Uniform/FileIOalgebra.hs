@@ -1,4 +1,4 @@
------------------------------------------------------------------------------
+----------------------------------------------------------------------
 --
 -- Module      :  Uniform.FileIO
 -- Copyright   :  andrew u frank -
@@ -9,21 +9,9 @@
 -- approach: addExtension checks for bad extension characters
 -- checks for filenames in the instances which use legalPathname
 --
--- naming consistentl dir (not directory)
------------------------------------------------------------------------------
---{-# OPTIONS_GHC -F -pgmF htfpp #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+----------------------------------------------------------------------
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
 
--- {-# LANGUAGE TypeSynonymInstances  #-}
--- {-# LANGUAGE OverloadedStrings     #-}
--- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
-
--- | the basic file io - translated for the Either or ErrorT signaling style
---  there are better (higher performance methods - replace while retaining conditions
 module Uniform.FileIOalgebra
   ( module Uniform.FileIOalgebra,
     module Uniform.Error,
@@ -32,14 +20,7 @@ module Uniform.FileIOalgebra
   )
 where
 
---import qualified Data.Text as T
---import qualified System.Posix  as Posix (FileStatus, Epoch)
 import qualified System.Directory as D
----- using uniform:
---hiding ((<.>), (</>))
-
--- import           Uniform.Filenames
-
 import System.IO (Handle, IOMode (..))
 import Uniform.Error
 import Uniform.FileStatus (EpochTime, FileStatus)
@@ -94,14 +75,6 @@ class DirOps fp where
 class (Show fp) => FileOps fp where
   doesFileExist' :: fp -> ErrIO Bool
 
-  --    doesFileOrDirExist :: fp -> ErrIO Bool
-  --    doesFileOrDirExist fp = do
-  --        d <- doesDirExist fp
-  --        f <- doesFileExist fp
-  --        return   (d || f)
-
-  --    getPermissions' :: fp -> ErrIO D.Permissions
-
   copyOneFile :: fp -> fp -> ErrIO ()
   -- ^ copy a file from old to new
   -- source must exist, target must NOT exist
@@ -149,10 +122,6 @@ class (Show fp) => FileOps fp where
   -- ^ check the read, write and execute permission on file
   -- dir get content needs execute,
 
-  --    isFileAbeforeB :: fp -> fp -> ErrIO Bool
-  --    -- ^ check if the first file A is touched before file B
-  --    -- uses modification time
-
   getFileModificationTime :: fp -> ErrIO EpochTime
   -- ^ get the modification time  (replaces isFileAbeforeB)
 
@@ -164,27 +133,13 @@ class (Show fp) => FileOps fp where
 
   openFile2handle :: fp -> IOMode -> ErrIO Handle
 
--- use hPutStr :: Handle -> Text -> IO ()
--- use closeFile2 without fp
-
--- read and write file in some monad
---class   FileOps3 fp fc m where
---
---    readFile3 :: fp -> m fc
---    writeFile3 :: fp -> fc -> m ()
-
 -- | operations on dir to produce file
 class (Show fd, Show ff) => FileOps2a fd ff where
   getDirContentFiles :: fd -> ErrIO [ff]
-  -- ^ getDirContentFiles dir = filterM f =<< getDirCont  dir
-  --     where f x =  doesFileExist'   x
 
   getDirContentNonHiddenFiles :: fd -> ErrIO [ff]
 
---
---
 ---- | the operations on files with content
---
 class
   (Show fp) =>
   FileOps2 fp fc
@@ -198,31 +153,7 @@ class
   -- read file
   appendFile2 :: fp -> fc -> ErrIO ()
 
-  -- append to a file
-
-  --    writeNewFileInDir :: fp -> fp -> fc ->  ErrIO ()
-  --    -- | create file in existing dir
-  --
-  --    writeFileCreateDir :: fp -> fp -> fc ->  ErrIO ()
-  --    -- | create file in existing dir
-  --
   writeFileOrCreate2 :: fp -> fc -> ErrIO ()
-  -- ^ write or create a file
-  -- if create dir if not exist (recursively for path)
-  -- cannot be instantiated in the abstract
-  -- because the getImmedateParentDir returns FilePath
-  --    writeFileOrCreate filepath st = do
-  --        let dir = getImmediateParentDir filepath
-
-  ----        let (dir, fn, ext) = splitFilepath filepath
-  --        --        writeFileCreateDir dir fn st
-  --        --                  writeFileCreateDir dirpath filename st = do
-  ----        let fp = dirpath `combine` filename
-  --        d <- doesDirExist' dir
-  --        --        f <- doesFileExist fp --
-  --        unless d $
-  --                createDirIfMissing' dir
-  --        writeFile2 filepath st
 
   --
 
@@ -234,42 +165,3 @@ class
     if f
       then readFile2 fp
       else return zero
-
---
---
-
---    writeNewFileInDir dirpath filename st =  -- writeNewFileInDir (b2s dirpath) (b2s filename) (b2s st)
---        do
---            let fp = dirpath `combine` filename
---            d <- doesDirectoryExist dirpath
---            f <- doesFileExist fp -- filename
---            if not d  then throwError . unwords $
-----            signalf  DirNotExist
---                    ["writeNewFileInDir"
---                        , show dirpath, "not existing"]
---                        else if f then throwError . unwords $
-----                            signalf  TargetExist
---                            ["writeNewFileInDir"
---                        , show filename, "exist"]
---                else  writeFile2 fp st
---
---    writeFileCreateDir dirpath filename st = do
---        let fp = dirpath `combine` filename
---        d <- doesDirectoryExist dirpath
---        f <- doesFileExist fp --
---        unless d $
---                createDirIfMissing dirpath
---        writeFile2 fp st
---
-----
---
---
----- | the signals for fileops
---data FileOpsSignals = TargetExist   -- ^ the file or dir exists
---        | DirNotExist
---        | DirEmpty
---        | SourceExist
---        | SourceNotExist
---        | SystemIOerror
---        | SomeReadError
---        deriving (Show, Eq)
