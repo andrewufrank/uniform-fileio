@@ -18,6 +18,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
+{-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 module Uniform.FileIO (
         module Uniform.Filenames
@@ -30,24 +31,43 @@ module Uniform.FileIO (
          , module Uniform.Piped
             ,  getAppUserDataDir'
          , makeAbsoluteFile'
+         , findDirs, isDir
+        --  , toFilePathT
+         , Path.IO.getAppUserDataDir
+         , Path.IO.doesFileExist  --works in IO, not ErrIO
+        --  , Path, Abs, Rel, Dir, File
 --         , homeDir2
             ) where
 
-import qualified System.Posix          as P (FileStatus)
-import           Uniform.FileIOalgebra hiding ((<.>), (</>))
+-- import qualified System.Posix          as P (FileStatus)
+import           Uniform.FileIOalgebra -- hiding ((<.>), (</>))
 import           Uniform.Filenames
 import           Uniform.FileStatus
 import           Uniform.FileStrings
 import           Uniform.Piped
 import           Uniform.TypedFile
-import           Uniform.Zero
-import qualified Path.IO (makeAbsolute, getAppUserDataDir)
+-- import           Uniform.Zero
+import qualified Path.IO (makeAbsolute, getAppUserDataDir, doesFileExist)
 
 makeAbsoluteFile' :: Path a File -> ErrIO (Path Abs File)
 makeAbsoluteFile' file = do
             f2 <- Path.IO.makeAbsolute (unPath file)
-            return . Path $ f2
+            return  f2
 
 getAppUserDataDir' :: String -> ErrIO (Path Abs Dir)
-getAppUserDataDir' appName  = fmap Path $ Path.IO.getAppUserDataDir $ appName
+getAppUserDataDir' appName  = Path.IO.getAppUserDataDir $ appName
 
+findDirs :: [FilePath] -> ErrIO [Path Abs Dir]
+-- ^ find directories in a list of files
+findDirs fns = do
+    mdirs <- mapM isDir fns
+    return . catMaybes $ mdirs
+
+isDir :: FilePath -> ErrIO (Maybe (Path Abs Dir))
+-- ^ is this filepateh an directory
+isDir fn = do
+    st <- getFileStatus' fn
+    return (if isDirectory st then Just (makeAbsDir fn) else Nothing)
+
+-- toFilePathT :: Path a b  -> Text
+-- toFilePathT = s2t . toFilePath

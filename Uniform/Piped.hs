@@ -6,19 +6,20 @@
 -- | the recursive access to many files not blocking
 -----------------------------------------------------------------------------
 --{-# OPTIONS_GHC -F -pgmF htfpp #-}
-{-# LANGUAGE
-    MultiParamTypeClasses
---    , TypeSynonymInstances
-    , FlexibleInstances
-    , FlexibleContexts
-    , ScopedTypeVariables
-    , UndecidableInstances
-    , OverloadedStrings
---    , TypeFamilies
-    #-}
+{-# LANGUAGE FlexibleContexts         #-}
+{-# LANGUAGE FlexibleInstances        #-}
+{-# LANGUAGE MultiParamTypeClasses    #-}
+{-# LANGUAGE OverloadedStrings        #-}
+{-# LANGUAGE ScopedTypeVariables      #-}
+{-# LANGUAGE TypeFamilies             #-}
+-- {-# LANGUAGE TypeSynonymInstances     #-}
+{-# LANGUAGE UndecidableInstances     #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
+{-# OPTIONS_GHC -fno-warn-deprecations #-}
 
 module  Uniform.Piped ( getRecursiveContents
+--    , pipeMap, pipeStdoutLn
+        , pipedDoIO
 
 
             ) where
@@ -26,29 +27,17 @@ module  Uniform.Piped ( getRecursiveContents
 import qualified Pipes as Pipe
 import  Pipes ((>->))
 import qualified Pipes.Prelude as PipePrelude
---import Control.Monad (forM_)
-
---import System.Directory (doesDirectoryExist, getDirectoryContents)
---import System.Directory (doesDirectoryExist, getDirectoryContents)
-import System.Environment (getArgs)
---import System.FilePath ((</>))
---import System.IO (openFile, IOMode (..), hClose)
+-- import System.Environment (getArgs)
 
 ---- using uniform:
 import Uniform.Error
---import Uniform.Zero
-import Uniform.Strings hiding ((<.>), (</>))
---
---import FileIO.Filenames
---import Uniform.FileIO
+-- import Uniform.Strings hiding ((<.>), (</>))
+
 import Uniform.FileStrings
-import Uniform.Filenames
+-- import Uniform.Filenames
 import Data.List (sort)
 import qualified Path.IO  (searchable, readable)
 
---import Test.Framework
---import Test.Invariant
---
 
 getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())
                   Path Abs Dir
@@ -68,43 +57,13 @@ getRecursiveContents  fp = do
                         Pipe.lift $ putIOwords ["recurseDir files\n", showT files]
                         Pipe.lift $ putIOwords ["recurseDir directories\n", showT dirs]
 
-                    Prelude.mapM_ (Pipe.yield) (sort files)
+                    Prelude.mapM_ Pipe.yield (sort files)
 --                                (Path.IO.sort (map unPath files))
-                    Prelude.mapM_ (getRecursiveContents) (sort dirs)
+                    Prelude.mapM_ getRecursiveContents (sort dirs)
 --                            (Path.IO.sort (map unPath dirs))
                     return ()--    where processOneFile fp = Pipe.yield fp
 
 
-
-
-
-
-
-
--------------------old
---getRecursiveContents :: LegalPathname -> Producer LegalPathname  ErrIO ()
---getRecursiveContents topPath = do
---
-----  lift $ putIOwords ["getRecursiveContents", showT topPath]
---  properNames <- lift $ getDirContentNonHidden topPath
---  -- lift into Producer (ie. proxy)
-----  let properNames = filter (`notElem` [".", ".."]) names
---  forM_ properNames $ \name -> do
---    let path = topPath </> name
---    isLink <- lift $ checkSymbolicLink path
---    if isLink then return ()
---        else do
---            isDirectory <- lift $ doesDirExist path
---            isReadExecutable <- lift $ getFileAccess path (True, False, True)
---            if isDirectory && isReadExecutable
---              then   getRecursiveContents path
---              else  do
---                    isReadable <- lift $ getFileAccess path (True, False, False)
-----                    lift $ putIOwords ["getRecursiveContents isReadable"
-----                                    , showT isReadable, showT path]
---                    if isReadable
---                            then yield path
---                            else return ()
 --
 ---- examples how to use...
 --
@@ -125,16 +84,14 @@ getRecursiveContents  fp = do
 --
 --
 --
---pipedDoIO :: LegalPathname -> LegalPathname -> (LegalPathname -> ErrIO Text) -> ErrIO ()
----- | write to the first filename the operation applied to the dir tree in the second
----- first path must not be non-readable dir or
---pipedDoIO file path transf =  do
---  hand <-   openFile file WriteMode
---  runEffect $
---    getRecursiveContents path
---    >-> P.mapM (fmap t2s . transf)
-----    >-> P.stdoutLn
---    >-> P.toHandle hand
---  closeFile2 hand
-
-
+-- a convenient function to go through a directory and
+-- recursively apply a function to each
+pipedDoIO :: Path Abs File -> Path Abs Dir -> (Path Abs File -> Text) -> ErrIO ()
+pipedDoIO file path transf =  do
+    hand <-   openFile2handle file WriteMode
+    Pipe.runEffect $
+                getRecursiveContents path
+                >-> PipePrelude.map ( t2s . transf)  -- some IO type left?
+                >-> PipePrelude.toHandle hand
+    closeFile2 hand
+    return ()

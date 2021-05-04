@@ -20,8 +20,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE TypeSynonymInstances  #-}
-{-# LANGUAGE OverloadedStrings     #-}
+-- {-# LANGUAGE TypeSynonymInstances  #-}
+-- {-# LANGUAGE OverloadedStrings     #-}
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
 module Uniform.FileIOalgebra (
@@ -39,7 +39,8 @@ import Uniform.FileStatus (FileStatus, EpochTime)
 ---- using uniform:
 import           Uniform.Error --hiding ((<.>), (</>))
 import           Uniform.Zero
-import           Uniform.Filenames
+-- import           Uniform.Filenames
+import Uniform.Time (epochTime2UTCTime, UTCTime)
 import System.IO (Handle, IOMode (..) )
 
 class FileHandles t where
@@ -69,7 +70,20 @@ class DirOps fp where
     -- ^ rename directory old to new
     -- signals: getFileStatus: does not exist (No such file or directory)
 
-class FileOps fp   where
+    getDirectoryDirs' ::  fp -> ErrIO [fp]
+    -- get the directories (but not . and ..)
+    -- getDirectoryDirs' dir = filterM f =<< getDirCont  dir
+    --     where f  =  doesDirExist'  
+    getDirectoryDirsNonHidden' ::  fp -> ErrIO [fp]
+
+    copyDirRecursive :: fp -> fp -> ErrIO ()
+    -- | copy the directory content recursively, does not follow symlink
+    -- implemented only for Path n Dir, not FilePath
+
+    deleteDirRecursive :: fp -> ErrIO ()
+    -- ^ delete a directory (even non empty), no error if not existing
+
+class (Show fp) => FileOps fp   where
     doesFileExist' :: fp -> ErrIO Bool
 --    doesFileOrDirExist :: fp -> ErrIO Bool
 --    doesFileOrDirExist fp = do
@@ -79,14 +93,17 @@ class FileOps fp   where
 
 --    getPermissions' :: fp -> ErrIO D.Permissions
 
-    copyFile' :: fp -> fp ->  ErrIO ()
+    copyOneFile :: fp -> fp ->  ErrIO ()
     -- ^ copy a file from old to new
-    renameFile' :: fp -> fp ->  ErrIO ()
+    -- source must exist, target must NOT exist 
+    copyOneFileOver :: fp -> fp ->  ErrIO ()
+    -- ^ copy a file from old to new
+    -- source must exist, target may exist 
+
+    renameOneFile :: fp -> fp ->  ErrIO ()
     -- ^ rename a file from old to new
 
     deleteFile :: fp -> ErrIO ()
-    deleteDirRecursive :: fp -> ErrIO ()
-    -- ^ delete a directory (even non empty), no error if not existing
 
 --    assertDirNotExist :: fp -> ErrIO ()
 --    -- ^ delete a directory (even non empty), if exist
@@ -95,13 +112,16 @@ class FileOps fp   where
     -- not returning the special entries   . and ..
         -- filenames completed with the filename calling
         -- check access and readable
+        -- returns for filepath always an absolute path
+        -- for Path Rel gives Path Rel results
     getDirCont :: fp ->  ErrIO [fp] --  (Maybe [String])
     -- | get the directory content - if not existing Nothing, if empty Just []
     -- not returning any hidden files
     -- alphabetic search to assure that equal directories have equal conten
     -- independent of file system internal structure
     -- filenames completed with calling fp
-    getDirContentNonHidden :: fp ->  ErrIO [fp]
+    -- only for filepath!
+    getDirContNonHidden :: fp ->  ErrIO [fp]
 
     getMD5 :: fp -> ErrIO (Maybe Text)
     -- get MD5, but why Text  -- TODO
@@ -123,6 +143,9 @@ class FileOps fp   where
 
     getFileModificationTime :: fp -> ErrIO EpochTime
     -- ^ get the modification time  (replaces isFileAbeforeB)
+    getFileModificationUTCTime :: fp -> ErrIO UTCTime
+    -- ^ get the modification time  in UTCTIme
+    getFileModificationUTCTime = fmap epochTime2UTCTime . getFileModificationTime
 
 -- operations on handle
 
@@ -137,7 +160,13 @@ class FileOps fp   where
 --    readFile3 :: fp -> m fc
 --    writeFile3 :: fp -> fc -> m ()
 
+-- | operations on dir to produce file
+class (Show fd, Show ff) => FileOps2a fd ff where 
+    getDirContentFiles :: fd -> ErrIO [ff]
+    -- ^ getDirContentFiles dir = filterM f =<< getDirCont  dir
+    --     where f x =  doesFileExist'   x
 
+    getDirContentNonHiddenFiles :: fd -> ErrIO [ff]
 --
 --
 ---- | the operations on files with content
@@ -162,10 +191,10 @@ class (Show fp) =>
 --    -- | create file in existing dir
 --
     writeFileOrCreate2 :: fp -> fc -> ErrIO ()
-   -- | write or create a file
-   -- if create dir if not exist (recursively for path)
-   -- cannot be instantiated in the abstract
-   -- because the getImmedateParentDir returns FilePath
+    -- ^ write or create a file
+    -- if create dir if not exist (recursively for path)
+    -- cannot be instantiated in the abstract
+    -- because the getImmedateParentDir returns FilePath
 --    writeFileOrCreate filepath st = do
 --        let dir = getImmediateParentDir filepath
 ----        let (dir, fn, ext) = splitFilepath filepath
