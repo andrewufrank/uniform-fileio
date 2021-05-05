@@ -23,14 +23,15 @@ import Pipes ((>->))
 import qualified Pipes as Pipe
 import qualified Pipes.Prelude as PipePrelude
 import Uniform.Error
-  ( ErrIO,
-    ErrorT,
-    Text,
-    putIOwords,
-    showT,
-    t2s,
-    when,
-  )
+--   ( ErrIO,
+--     ErrorT,
+--     Text,
+--     putIOwords,
+--     showT,
+--     t2s,
+--     when,
+--   )
+import Uniform.Strings 
 import Uniform.FileStrings
 
 getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())

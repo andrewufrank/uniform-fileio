@@ -28,6 +28,8 @@ import Uniform.FileIOalgebra (Handle)
 import Uniform.FileStatus (EpochTime)
 import Uniform.FileStrings
 import Uniform.Filenames as FN (Path)
+import Uniform.Strings 
+import Uniform.Error
 
 data TypedFile5 a b = TypedFile5 {tpext5 :: Extension}
 

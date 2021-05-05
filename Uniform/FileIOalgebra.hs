@@ -14,7 +14,7 @@
 
 module Uniform.FileIOalgebra
   ( module Uniform.FileIOalgebra,
-    module Uniform.Error,
+    -- module Uniform.Error,
     module Uniform.Zero,
     module System.IO,
   )
@@ -22,10 +22,11 @@ where
 
 import qualified System.Directory as D
 import System.IO (Handle, IOMode (..))
-import Uniform.Error
+import Uniform.Error (ErrIO)
 import Uniform.FileStatus (EpochTime, FileStatus)
 import Uniform.Time (UTCTime, epochTime2UTCTime)
-import Uniform.Zero
+import Uniform.Zero (Zeros(..))
+import Uniform.Strings (Text)
 
 class FileHandles t where
   write2handle :: Handle -> t -> ErrIO ()

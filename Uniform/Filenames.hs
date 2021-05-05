@@ -39,7 +39,10 @@ import Path
 import qualified Path
 import qualified Path.IO as PathIO
 import qualified System.FilePath as S
-import Uniform.Error
+import Uniform.Error(ErrIO, callIO)
+-- import Uniform.Zero(Zeros(..))
+import Uniform.Strings
+-- (Text, fromJustNote, t2s)
 
 takeBaseName' :: FilePath -> FilePath
 takeBaseName' = S.takeBaseName

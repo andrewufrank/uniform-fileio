@@ -26,7 +26,8 @@ where
 
 import qualified System.Directory as S
 import qualified System.Posix as P
-import Uniform.Error (ErrIO, callIO, putIOwords, showT)
+import Uniform.Error 
+-- (ErrIO, callIO, putIOwords, showT)
 import Uniform.Filenames (Path, toShortFilePath)
 import Uniform.Strings (putIOwords, showT)
 

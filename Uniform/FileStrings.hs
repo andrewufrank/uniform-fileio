@@ -25,7 +25,7 @@ where
 import Control.Arrow (first, second)
 import Control.DeepSeq (force, ($!!))
 import Control.Exception (SomeException, catch)
-import Control.Monad (filterM)
+import Control.Monad (filterM, when)
 import Control.Monad.Catch as Catch
   ( Exception,
     MonadThrow,
@@ -51,6 +51,9 @@ import Uniform.FileIOalgebra
 import Uniform.FileStatus
 import Uniform.Filenames
 import Uniform.Filenames as FN (toFilePath)
+import Uniform.Strings -- (Text)
+import Uniform.Error
+
 
 closeFile2 :: SIO.Handle -> ErrIO ()
 -- close a handle, does not need a filepath
