@@ -69,6 +69,8 @@ stripProperPrefixMaybe dir fn = Path.stripProperPrefix (unPath dir) (unPath fn)
 unPath :: a -> a
 unPath = id
 
+    
+
 makeRelFile :: FilePath -> Path Rel File
 makeRelDir :: FilePath -> Path Rel Dir
 makeAbsFile :: FilePath -> Path Abs File

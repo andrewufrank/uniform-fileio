@@ -1,19 +1,21 @@
 name:         uniform-fileio
-version:      0.0.16
-license:      GPL
-license-file: GPL_3
-maintainer:   Andrew U. Frank <andrewufrank@geoinfo.tuwien.ac.at>
+version:      0.1.0
+license:      GPL-2.0-only
+# license-file: GPL_3
+maintainer:   Andrew U. Frank <uniform@gerastree.at>
 author:       Andrew Frank
 copyright:    2021 Andrew U. Frank
-category:     Data Text 
-synopsis: uniform file handling operations
+category:     Data Text Uniform
+synopsis: Uniform file handling operations
 description: |
-  uniform operations for handling files and file path names
+  Uniform operations for handling files and file path names
   independent from the representation. 
 
   Additionally, functions to read and write files for specific 
   typed content (marked by extension).
-   
+
+  Please see the README on GitHub at <https://github.com/andrewufrank/uniform-fileiio/readme>
+
 extra-source-files:
 - README.md
 - ChangeLog.md
@@ -24,46 +26,20 @@ dependencies:
 - safe
 - text
 - bytestring
-# - pretty-show
-# - MissingH
-# - split
-# - snap-core
-# - text-icu
-# - network-uri
-# - test-invariant
-# - numeric-prelude
-# - uniform-algebras
-#             bytestring -any,
-#             directory ,
 - directory
-#             filepath -any,
-#             pureMD5 -any,
 - pureMD5
 - deepseq
-# - text
-#             deepseq,
-#             text -any,
-#             unix -any,
 - unix
 - pipes
-#             pipes ,
-#             safe,
-#             path ,
 - path
 - path-io
 - filepath
-#             path-io ,
-#             exceptions
 - exceptions
-#             , split
 - zlib
 - uniform-strings
 - uniform-error
 - uniform-algebras
 - uniform-time
-# - uniform-time 
-# - HTF
-# - test-invariant
 
 library:
   source-dirs: 
