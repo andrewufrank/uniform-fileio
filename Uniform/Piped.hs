@@ -83,10 +83,25 @@ getRecursiveContents fp = do
 -- recursively apply a function to each
 pipedDoIO :: Path Abs File -> Path Abs Dir -> (Path Abs File -> Text) -> ErrIO ()
 pipedDoIO file path transf = do
+        -- pipedDoIOwithFilter file path ?? transf
   hand <- openFile2handle file WriteMode
   Pipe.runEffect $
     getRecursiveContents path
       >-> PipePrelude.map (t2s . transf) -- some IO type left?
+      >-> PipePrelude.toHandle hand
+  closeFile2 hand
+  return ()
+
+-- a convenient function to go through a directory and
+-- recursively apply a function to each file or directory
+-- filters for extension md
+pipedDoIOwithFilter :: Path Abs File -> Path Abs Dir -> Extension -> (Path Abs File -> ErrIO String) -> ErrIO ()
+pipedDoIOwithFilter file path ext opex = do
+  hand <- openFile2handle file WriteMode
+  Pipe.runEffect $
+    getRecursiveContents path
+      >-> PipePrelude.filter (hasExtension ext)
+      >-> PipePrelude.mapM opex
       >-> PipePrelude.toHandle hand
   closeFile2 hand
   return ()

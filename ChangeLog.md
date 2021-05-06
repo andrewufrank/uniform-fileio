@@ -8,3 +8,7 @@
     0.0.14.6 fix fileExtension confusion
     0.0.15.0 fix building issue with time 
     0.0.15.2 lts 16.0
+0.1.0 put in hackage
+    removed doubtful pieces
+0.1.1
+    added pipedDoIOWithFilter 
