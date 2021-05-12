@@ -11,6 +11,8 @@
 ----------------------------------------------------------------------
 
 {-# OPTIONS_GHC -fno-warn-deprecations #-}
+-- {-# LANGUAGE DeriveAnyClass          #-}
+
 
 module Uniform.FileIO (
         module Uniform.Filenames
@@ -19,6 +21,7 @@ module Uniform.FileIO (
          , module Uniform.TypedFile
          , module Uniform.FileStrings
          , module Uniform.Piped
+         , module Uniform.PathShowCase
          , Path.IO.getAppUserDataDir
          , Path.IO.doesFileExist  --works in IO, not ErrIO
             ) where
@@ -29,4 +32,9 @@ import           Uniform.FileStatus
 import           Uniform.FileStrings
 import           Uniform.Piped
 import           Uniform.TypedFile
+import Uniform.PathShowCase()
 import qualified Path.IO (makeAbsolute, getAppUserDataDir, doesFileExist)
+
+-- import UniformBase
+
+data Aby40 = Aby40 Int (Path Abs Dir)  deriving (Eq, Ord, Show, Read)

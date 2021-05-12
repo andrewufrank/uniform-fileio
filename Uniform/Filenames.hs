@@ -22,7 +22,7 @@ module Uniform.Filenames
     Rel,
     File,
     Dir,
-    Path,
+    Path.Path(..),
     toFilePath,
   )
 where
@@ -37,6 +37,7 @@ import Path
     toFilePath,
   )
 import qualified Path
+import  Path.Internal (Path(..))
 import qualified Path.IO as PathIO
 import qualified System.FilePath as S
 import Uniform.Error(ErrIO, callIO)

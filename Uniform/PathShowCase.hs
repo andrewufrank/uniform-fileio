@@ -13,8 +13,9 @@
 {-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 
 module Uniform.PathShowCase
+  (module Uniform.PathShowCase)
 
-where
+  where
 
 import Uniform.Strings
 -- import Uniform.Error
