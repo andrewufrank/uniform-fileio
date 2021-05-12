@@ -68,11 +68,11 @@ test_recursive = do
 
 
 
-testDir =  makeAbsDir "/home/frank/Workspace8/uniform-fileio/testDirFileIO"
-test_getRec = do
-    res <- runErr $ pipedDo testDir (showT)
-    assertEqual (Right ()) res
-    -- check manually
+-- testDir =  makeAbsDir "/home/frank/Workspace8/uniform-fileio/testDirFileIO"
+-- test_getRec = do
+--     res <- runErr $ pipedDo testDir (showT)
+--     assertEqual (Right ()) res
+--     -- check manually
 
 ----for testing:
 readFile5 :: Path ar File -> IO Text
