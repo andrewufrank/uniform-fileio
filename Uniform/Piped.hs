@@ -14,6 +14,7 @@ module Uniform.Piped
   ( getRecursiveContents,
     --    , pipeMap, pipeStdoutLn
     pipedDoIO,
+    pipedDoIOwithFilter
   )
 where
 
