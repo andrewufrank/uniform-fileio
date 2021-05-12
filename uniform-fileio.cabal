@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6a46440939b3b6a958a97280a715779e5b8a1b1f1ff400617f6d66584dd79b0a
+-- hash: 313a77f76b1b3a72bad8c53b1a6799d0f6708e478e0cd49d41dd5565f276f86f
 
 name:           uniform-fileio
 version:        0.1.1
@@ -34,6 +34,7 @@ library
       Uniform.Filenames
       Uniform.FileStatus
       Uniform.FileStrings
+      Uniform.PathShowCase
       Uniform.Piped
       Uniform.TypedFile
   other-modules:
@@ -63,13 +64,14 @@ library
   default-language: Haskell2010
   autogen-modules: Paths_uniform_fileio
 
-test-suite strings-test
+test-suite fileio-test
   type: exitcode-stdio-1.0
   main-is: Testing.hs
   other-modules:
       Uniform.Filenames_test
       Uniform.FileStatus_test
       Uniform.FileStrings_test
+      Uniform.PathShowCase_test
       Uniform.Piped_test
       Uniform.TypedFile_test
       Paths_uniform_fileio

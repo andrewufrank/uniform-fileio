@@ -31,7 +31,7 @@ import qualified Pipes.Prelude as PipePrelude
 ----import System.IO (openFile, IOMode (..), hClose)
 --
 ------ using uniform:
---import Uniform.Error
+import Uniform.Error
 ----import Uniform.Zero
 import Uniform.Strings hiding ((<.>), (</>))
 ----

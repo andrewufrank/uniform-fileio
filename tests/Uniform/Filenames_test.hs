@@ -1,4 +1,3 @@
---{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -6,19 +5,20 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeSynonymInstances #-}
------------------------------------------------------------------------------
+----------------------------------------------------------------------
 --
 -- Module      :  Filenames
 -- Copyright   :  andrew u frank -
 --
------------------------------------------------------------------------------
+----------------------------------------------------------------------
 {-# OPTIONS_GHC -F -pgmF htfpp #-}
 
 -- {-# OPTIONS_GHC -fno-warn-missing-methods #-}
 
--- | the operations on filenames and extensions
---  uses the Path library
--- is a class except for the make
+{- | the operations on filenames and extensions
+  uses the Path library
+ is a class except for the make
+-}
 module Uniform.Filenames_test where
 
 --
@@ -26,6 +26,7 @@ module Uniform.Filenames_test where
 ---- using uniform:
 
 -- import Test.Invariant
+import Uniform.Strings 
 
 import qualified Path -- for Generics
 import Test.Framework
@@ -103,6 +104,7 @@ test_sp3 =
     (x1f :: Path Abs File)
     (read "Path Abs File /somedir/more/afile.ext")
 
+
 data Rec11 = Rec11 {date :: Path Abs File} deriving (Show, Read, Eq)
 
 rec1 = Rec11 x1f
@@ -135,8 +137,8 @@ test_s2aa = assertEqual "S2 \"eins\" \"zwei\"" (s2as)
 test_s2a = assertEqual s2a (read "S2 \"eins\" \"zwei\"")
 
 data Xt = Xt
-  { p :: Path Abs File,
-    q :: Text
+  { p :: Path Abs File
+  , q :: Text
   }
   deriving (Show, Read, Eq)
 

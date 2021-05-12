@@ -13,7 +13,7 @@ module Uniform.TypedFile_test   where
 
 import Test.Framework
 
---import           Uniform.Error
+import           Uniform.Error
 import           Uniform.FileIOalgebra (Handle)
 import           Uniform.Filenames
 import           Uniform.FileStrings

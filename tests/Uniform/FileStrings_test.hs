@@ -20,6 +20,8 @@
 
 module Uniform.FileStrings_test  where
 
+import Uniform.Strings 
+import Uniform.Error
 import Uniform.FileStrings
 import           Uniform.FileIOalgebra
 --import           Uniform.FilenamesAlgebra

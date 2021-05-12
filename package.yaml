@@ -62,7 +62,7 @@ library:
 #     - uniform-algebras
 
 tests:
-  strings-test:
+  fileio-test:
     main:                Testing.hs
     source-dirs:         tests
     ghc-options:
@@ -70,9 +70,7 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - uniform-algebras
     - HTF
     - test-invariant
     - quickcheck-text
-    - uniform-strings
     - uniform-fileio

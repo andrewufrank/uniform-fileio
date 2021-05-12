@@ -43,6 +43,7 @@ import Uniform.Error(ErrIO, callIO)
 -- import Uniform.Zero(Zeros(..))
 import Uniform.Strings
 -- (Text, fromJustNote, t2s)
+import Uniform.PathShowCase ()
 
 takeBaseName' :: FilePath -> FilePath
 takeBaseName' = S.takeBaseName
