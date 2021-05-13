@@ -21,7 +21,7 @@ module Uniform.FileIO (
          , module Uniform.TypedFile
          , module Uniform.FileStrings
          , module Uniform.Piped
-         , module Uniform.PathShowCase
+        --  , module Uniform.PathShowCase
          , Path.IO.getAppUserDataDir
          , Path.IO.doesFileExist  --works in IO, not ErrIO
             ) where
@@ -32,7 +32,7 @@ import           Uniform.FileStatus
 import           Uniform.FileStrings
 import           Uniform.Piped
 import           Uniform.TypedFile
-import Uniform.PathShowCase()
+-- import Uniform.PathShowCase()
 import qualified Path.IO (makeAbsolute, getAppUserDataDir, doesFileExist)
 
 -- import UniformBase

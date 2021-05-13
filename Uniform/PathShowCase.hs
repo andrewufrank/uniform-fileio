@@ -13,7 +13,8 @@
 {-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 
 module Uniform.PathShowCase
-  (module Uniform.PathShowCase)
+  (module Uniform.PathShowCase
+  ,module Path )
 
   where
 
@@ -41,7 +42,7 @@ readsPrecForPath parseAD prefix1 msg a0 =
     res1 = parseAD a4   -- there seem not to be a parser for filepath
     res2 = fromJustNote (unwords["not a path ", msg, "input", show a0]) res1
     terminate :: Char -> Bool
-    terminate c = not (c `elem`   [',','}'])
+    terminate c = c `notElem` [',','}']
     -- add here character to stop reading !!
 
 instance  Read (Path Abs Dir) where
