@@ -31,16 +31,17 @@ module Uniform.Filenames
 where
 
 -- for Generics
-import Path 
-  ( Abs,
-    Dir,
-    File,
-    Path,
-    Rel,
-    toFilePath,
-    Path
-  )
-import qualified Path
+-- import Path 
+--   ( Abs,
+--     Dir,
+--     File,
+--     Path,
+--     Rel,
+--     toFilePath,
+--     Path
+--   )
+import Path hiding ((</>), addExtension)
+import qualified Path 
 -- import  Path.Internal (Path(..))
 import qualified Path.IO as PathIO
 import qualified System.FilePath as S

@@ -28,9 +28,9 @@ module Uniform.Filenames_test where
 -- import Test.Invariant
 import Uniform.Strings 
 
-import qualified Path -- for Generics
+-- import qualified Path -- for Generics
 import Test.Framework
-import Uniform.Error hiding ((<.>), (</>))
+-- import Uniform.Error hiding ((<.>), (</>))
 import Uniform.Filenames
 
 --

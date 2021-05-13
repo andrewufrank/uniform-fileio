@@ -13,8 +13,8 @@
 {-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 
 module Uniform.PathShowCase
-  (module Uniform.PathShowCase
-  ,module Path )
+  ( module Uniform.PathShowCase
+  , module Path )
 
   where
 
