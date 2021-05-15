@@ -22,8 +22,8 @@ module Uniform.FileIO (
          , module Uniform.FileStrings
          , module Uniform.Piped
         --  , module Uniform.PathShowCase
-        --  , Path.IO.getAppUserDataDir
-        --  , Path.IO.doesFileExist  --works in IO, not ErrIO
+         , Path.IO.getAppUserDataDir
+         , Path.IO.doesFileExist  --works in IO, not ErrIO
             ) where
 
 import           Uniform.FileIOalgebra -- hiding ((<.>), (</>))
@@ -33,7 +33,7 @@ import           Uniform.FileStrings
 import           Uniform.Piped
 import           Uniform.TypedFile
 -- import Uniform.PathShowCase()
--- import qualified Path.IO (makeAbsolute, getAppUserDataDir, doesFileExist)
+import qualified Path.IO (makeAbsolute, getAppUserDataDir, doesFileExist)
 
 -- import UniformBase
 

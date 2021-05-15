@@ -89,6 +89,9 @@ instance  {-# OVERLAPPING #-} Show (Path Rel Dir) where
 instance NiceStrings (Path a b) where
   showNice = s2t . toFilePath
 
+instance PrettyStrings (Path a b) where
+  showPretty = showNice 
+  
 toFilePathT :: Path b t -> Text
 toFilePathT = s2t . toFilePath
 
