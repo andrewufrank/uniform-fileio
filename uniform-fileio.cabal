@@ -57,7 +57,7 @@ library
     , text
     , uniform-algebras
     , uniform-error
-    , uniform-strings
+    , uniform-strings ==0.1.1
     , uniform-time
     , unix
     , zlib
