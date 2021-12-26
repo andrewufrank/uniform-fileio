@@ -1,10 +1,10 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.34.5.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 313a77f76b1b3a72bad8c53b1a6799d0f6708e478e0cd49d41dd5565f276f86f
+-- hash: 645842277628dd01f2c82c7ee769d0f09f8996301065d9e7ed1c7d693985560f
 
 name:           uniform-fileio
 version:        0.1.1
@@ -40,7 +40,7 @@ library
   other-modules:
       Paths_uniform_fileio
   hs-source-dirs:
-      ./.
+      ./
   build-depends:
       base >=4.7 && <5
     , bytestring
@@ -98,7 +98,7 @@ test-suite fileio-test
     , uniform-algebras
     , uniform-error
     , uniform-fileio
-    , uniform-strings
+    , uniform-strings ==0.1.1
     , uniform-time
     , unix
     , zlib
