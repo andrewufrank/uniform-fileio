@@ -12,3 +12,5 @@
     removed doubtful pieces
 0.1.1
     added pipedDoIOWithFilter 
+0.1.2
+    prepare for 9.2.1 

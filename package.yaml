@@ -1,5 +1,5 @@
 name:         uniform-fileio
-version:      0.1.1
+version:      0.1.2
 license:      GPL-2.0-only
 # license-file: GPL_3
 maintainer:   Andrew U. Frank <uniform@gerastree.at>
@@ -37,9 +37,9 @@ dependencies:
 - filepath
 - exceptions
 - zlib
-- uniform-strings ==0.1.1
-- uniform-error
-- uniform-algebras
+- uniform-strings  == 0.1.2
+- uniform-error 
+- uniform-algebras == 0.1.2
 - uniform-time
 
 library:
