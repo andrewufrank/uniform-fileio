@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3f1b2ef249b7e949f99b680842d450c69e069caecd4922cf06add0a8a5e88a7c
+-- hash: 33312bf82225b563d57ce6bee1f6a88efc12f69f6fab28e8b5b87bc560b3efdb
 
 name:           uniform-fileio
 version:        0.1.2
@@ -55,10 +55,10 @@ library
     , pureMD5
     , safe
     , text
-    , uniform-algebras ==0.1.2
-    , uniform-error
-    , uniform-strings ==0.1.2
-    , uniform-time
+    , uniform-algebras >=0.1.2
+    , uniform-error >=0.1.0
+    , uniform-strings >=0.1.2
+    , uniform-time >=0.1.0
     , unix
     , zlib
   default-language: Haskell2010

@@ -37,10 +37,10 @@ dependencies:
 - filepath
 - exceptions
 - zlib
-- uniform-strings  == 0.1.2
-- uniform-error 
-- uniform-algebras == 0.1.2
-- uniform-time
+- uniform-strings  >= 0.1.2
+- uniform-error    >= 0.1.0
+- uniform-algebras >= 0.1.2
+- uniform-time     >= 0.1.0
 
 library:
   source-dirs: 
