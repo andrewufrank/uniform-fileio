@@ -104,13 +104,11 @@ instance DirOps FilePath where
     testTarget <- doesDirExist' new
     if testTarget
       then
-        throwErrorT
-          [showT new]
+        throwErrorT . showT $ new 
       else
         if not testSource
           then
-            throwErrorT
-              [showT old]
+            throwErrorT . showT $ old 
           else do
             callIO $ putStrLn "renamed"
             r <- callIO $ D.renameDirectory old new
@@ -148,14 +146,12 @@ instance FileOps FilePath where
       else
         if not t
           then
-            throwErrorT
-              ["copyFile source not exist", showT old]
+            throwErrorWords ["copyFile source not exist", showT old]
           else
             if t2
               then
-                throwErrorT
-                  ["copyFile target exist", showT new]
-              else throwErrorT ["copyOneFile", "other error"]
+                throwErrorWords ["copyFile target exist", showT new]
+              else throwErrorWords ["copyOneFile", "other error"]
   copyOneFileOver old new = do
     -- may overwrite existing target
     t <- doesFileExist' old
@@ -167,7 +163,7 @@ instance FileOps FilePath where
           createDirIfMissing' dir
         callIO $ D.copyFile old new
       else -- not t - not existing source
-        throwErrorT ["copyFileOver source not exist", showT old]
+        throwErrorWords ["copyFileOver source not exist", showT old]
 
   getMD5 fn =
     do
@@ -179,11 +175,11 @@ instance FileOps FilePath where
           filedata :: L.ByteString <- L.readFile fn
           let res = showT $ md5 filedata
           return $!! (Just res)
-        else throwErrorT ["getMD5 error file not readable", showT fn]
-      `catchError` \e -> do
+        else throwErrorWords ["getMD5 error file not readable", showT fn]
+      `catchE` \e -> do
         putIOwords ["getMD5 in FileStrings.hs", showT fn, showT e]
 
-        throwErrorT ["getMD5 error for", showT fn]
+        throwErrorWords ["getMD5 error for", showT fn]
 
   getDirCont fn = getDirContAll True fn
 
@@ -227,7 +223,7 @@ getDirContAll hiddenFlag fn = do
       let r4 = map (fn </>) r3
       return r4
     else
-      throwErrorT
+      throwErrorWords
         [ "getDirCont not exist or not readable",
           showT fn,
           showT testDir,
@@ -315,8 +311,8 @@ instance (Show (Path ar File)) => FileOps (Path ar File) where
     callIO
       ( do
           Posix.fileAccess (unL fp) r w e
-          `catchError` \e -> do
-            putIOwords ["getFileAccess error", showT fp, s2t $ show e]
+          `catch` \e -> do
+            putIOwords ["getFileAccess error", showT fp, s2t $ show (e::SomeException)]
             return False
       )
 

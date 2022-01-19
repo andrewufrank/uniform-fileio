@@ -236,12 +236,14 @@ class (Eq (ExtensionType fp)) => Extensions fp where
   getExtension :: fp -> ExtensionType fp
   removeExtension :: fp -> fp
   addExtension :: ExtensionType fp -> fp -> fp
-  setFileExtension :: ExtensionType fp -> fp -> fp 
+--   setFileExtension :: ExtensionType fp -> fp -> fp 
+-- to avoid name clash with Path
 
   -- must not have an extension before
   (<.>) :: fp -> ExtensionType fp -> fp -- eror when not legal?
   (<.>) f e = addExtension e f
   setExtension :: ExtensionType fp -> fp -> fp
+  setExtension ext   = addExtension ext . removeExtension 
   hasExtension :: ExtensionType fp -> fp -> Bool
   hasExtension e = (e ==) . getExtension
 
@@ -261,7 +263,8 @@ instance Extensions FilePath where
   getExtension = removeChar '.' . snd . S.splitExtension
   addExtension e fp = fp S.<.> e
   removeExtension = fst . S.splitExtension
-  setFileExtension e = addExtension e . removeExtension
+--   setExtension e = addExtension e . removeExtension
+  
 
 --    hasExtension e = (e ==) . getExtension
 

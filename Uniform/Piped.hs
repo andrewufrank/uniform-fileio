@@ -37,7 +37,7 @@ import Uniform.FileStrings
 
 getRecursiveContents :: -- (Path Abs File-> Pipe.Proxy Pipe.X () () String (ErrorT Text IO) ())
   Path Abs Dir ->
-  Pipe.Proxy Pipe.X () () (Path Abs File) (ErrorT Text IO) ()
+  Pipe.Proxy Pipe.X () () (Path Abs File) ErrIO ()
 getRecursiveContents fp = do
   --    putIOwords ["recurseDir start", showT fp]
   perm <- Pipe.lift $ getPermissions' fp
