@@ -1,10 +1,10 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.34.6.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 85e0ed19163cd46e7637a01b40ddaa070dc0ab719e7c49910b57466e6f69753c
+-- hash: 21c3552a28c18c58a0b0d8885de87f2b10bff2082df7d3c4b2f56a258b8114fb
 
 name:           uniform-fileio
 version:        0.1.3
@@ -14,6 +14,8 @@ description:    Uniform operations for handling files and file path names
                 .
                 Additionally, functions to read and write files for specific 
                 typed content (marked by extension).
+                .
+                added stack build lts 19.16 for ghc 9.0.2
                 .
                 Please see the README on GitHub at <https://github.com/andrewufrank/uniform-fileiio/readme>
 category:       Data Text Uniform
