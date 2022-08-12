@@ -39,9 +39,9 @@ dependencies:
 - filepath
 - exceptions
 - zlib
-- uniform-strings  >= 0.1.2
-- uniform-error    >= 0.1.2
-- uniform-algebras >= 0.1.2
+- uniform-strings  >= 0.1.3
+- uniform-error    >= 0.1.4
+- uniform-algebras >= 0.1.4
 - uniform-time     >= 0.1.0
 
 library:
