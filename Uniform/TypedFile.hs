@@ -250,6 +250,9 @@ class FileHandles a => TypedFiles7a a b where
   read8 :: Path Abs File -> TypedFile5 a b -> ErrIO b
 
   write8 :: Path Abs File -> TypedFile5 a b -> b -> ErrIO ()
+
+
+  renameToBak8 :: Path Abs File -> TypedFile5 a b -> ErrIO ()
   -- ^ the createDir if missingis implied in the write
 
 instance (TypedFiles7 Text b) => TypedFiles7a Text b where
@@ -271,6 +274,12 @@ instance (TypedFiles7 Text b) => TypedFiles7a Text b where
     let fp2 = fp <.> tpext5 tp
     ares :: Text <- readFile2 fp2
     return . wrap7 $ ares
+
+  renameToBak8 fp tp = do 
+    let fp2 = fp <.> tpext5 tp 
+    let fpBak = fp <.> (Extension "bak")
+    renameOneFile fp2 fpBak 
+    return ()
 
 instance (TypedFiles7 L.ByteString b) => TypedFiles7a L.ByteString b where
   -- an instance for all what has text or bytestring  as underlying rep

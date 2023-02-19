@@ -147,10 +147,8 @@ class
   where
   --
   writeFile2 :: fp -> fc -> ErrIO ()
-
   -- write file if dir exist
   readFile2 :: fp -> ErrIO fc
-
   -- read file
   appendFile2 :: fp -> fc -> ErrIO ()
 
@@ -159,7 +157,6 @@ class
   --
 
   readFileOrZero2 :: (FileOps fp, Zeros fc) => fp -> ErrIO fc
-
   -- | reads file, if not present, returns zero
   readFileOrZero2 fp = do
     f <- doesFileExist' fp

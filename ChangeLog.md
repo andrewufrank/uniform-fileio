@@ -15,3 +15,4 @@
 0.1.2
     prepare for 9.2.1 
 0.1.3  changed for ExceptionT (stat ErrorT)
+0.1.3.1 added renameToBak8 in TypedFiles

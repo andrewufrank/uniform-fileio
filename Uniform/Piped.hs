@@ -95,7 +95,8 @@ pipedDoIO file path transf = do
 
 -- a convenient function to go through a directory and
 -- recursively apply a function to each file or directory
--- filters for extension md
+-- filters for extension (e.g. md)
+-- file for error messages 
 pipedDoIOwithFilter :: Path Abs File -> Path Abs Dir -> Extension -> (Path Abs File -> ErrIO String) -> ErrIO ()
 pipedDoIOwithFilter file path ext opex = do
   hand <- openFile2handle file WriteMode

@@ -1,13 +1,13 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.35.0.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 21c3552a28c18c58a0b0d8885de87f2b10bff2082df7d3c4b2f56a258b8114fb
+-- hash: 246f3fab757af87f498483e50715b5d69b22ce4daf74fc118838b075081547c7
 
 name:           uniform-fileio
-version:        0.1.3
+version:        0.1.3.1
 synopsis:       Uniform file handling operations
 description:    Uniform operations for handling files and file path names
                 independent from the representation. 
@@ -57,9 +57,9 @@ library
     , pureMD5
     , safe
     , text
-    , uniform-algebras >=0.1.2
-    , uniform-error >=0.1.2
-    , uniform-strings >=0.1.2
+    , uniform-algebras >=0.1.4
+    , uniform-error >=0.1.3.2
+    , uniform-strings >=0.1.3
     , uniform-time >=0.1.0
     , unix
     , zlib
@@ -73,7 +73,6 @@ test-suite fileio-test
       Uniform.Filenames_test
       Uniform.FileStatus_test
       Uniform.FileStrings_test
-      Uniform.PathShowCase_test
       Uniform.Piped_test
       Uniform.TypedFile_test
       Paths_uniform_fileio
@@ -99,10 +98,10 @@ test-suite fileio-test
     , safe
     , test-invariant
     , text
-    , uniform-algebras >=0.1.2
-    , uniform-error >=0.1.2
+    , uniform-algebras >=0.1.4
+    , uniform-error >=0.1.3.2
     , uniform-fileio
-    , uniform-strings >=0.1.2
+    , uniform-strings >=0.1.3
     , uniform-time >=0.1.0
     , unix
     , zlib
