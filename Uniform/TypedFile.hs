@@ -299,3 +299,9 @@ instance (TypedFiles7 L.ByteString b) => TypedFiles7a L.ByteString b where
     let fp2 = fp <.> tpext5 tp
     ares :: L.ByteString <- readFile2 fp2
     return . wrap7 $ ares
+
+  renameToBak8 fp tp = do 
+    let fp2 = fp <.> tpext5 tp 
+    let fpBak = fp <.> (Extension "bak")
+    renameOneFile fp2 fpBak 
+    return ()
