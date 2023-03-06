@@ -1,5 +1,5 @@
 name:         uniform-fileio
-version:      0.1.3.1
+version:      0.1.5.1
 license:      GPL-2.0-only
 # license-file: GPL_3
 maintainer:   Andrew U. Frank <uniform@gerastree.at>
@@ -14,8 +14,6 @@ description: |
 
   Additionally, functions to read and write files for specific 
   typed content (marked by extension).
-
-  added stack build lts 19.16 for ghc 9.0.2
   
   Please see the README on GitHub at <https://github.com/andrewufrank/uniform-fileiio/readme>
 
@@ -39,10 +37,10 @@ dependencies:
 - filepath
 - exceptions
 - zlib
-- uniform-strings  >= 0.1.3
-- uniform-error    >= 0.1.3.2
-- uniform-algebras >= 0.1.4
-- uniform-time     >= 0.1.0
+- uniform-strings  >= 0.1.5
+- uniform-error    >= 0.1.5
+- uniform-algebras >= 0.1.5
+- uniform-time     >= 0.1.5
 
 library:
   source-dirs: 

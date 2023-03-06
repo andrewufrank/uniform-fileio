@@ -4,18 +4,16 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 246f3fab757af87f498483e50715b5d69b22ce4daf74fc118838b075081547c7
+-- hash: 97d81afaf124fc69557e1bb823e85f2a639758c8c76252216ad730d201599cc8
 
 name:           uniform-fileio
-version:        0.1.3.1
+version:        0.1.5.1
 synopsis:       Uniform file handling operations
 description:    Uniform operations for handling files and file path names
                 independent from the representation. 
                 .
                 Additionally, functions to read and write files for specific 
                 typed content (marked by extension).
-                .
-                added stack build lts 19.16 for ghc 9.0.2
                 .
                 Please see the README on GitHub at <https://github.com/andrewufrank/uniform-fileiio/readme>
 category:       Data Text Uniform
@@ -57,10 +55,10 @@ library
     , pureMD5
     , safe
     , text
-    , uniform-algebras >=0.1.4
-    , uniform-error >=0.1.3.2
-    , uniform-strings >=0.1.3
-    , uniform-time >=0.1.0
+    , uniform-algebras >=0.1.5
+    , uniform-error >=0.1.5
+    , uniform-strings >=0.1.5
+    , uniform-time >=0.1.5
     , unix
     , zlib
   default-language: Haskell2010
@@ -98,11 +96,11 @@ test-suite fileio-test
     , safe
     , test-invariant
     , text
-    , uniform-algebras >=0.1.4
-    , uniform-error >=0.1.3.2
+    , uniform-algebras >=0.1.5
+    , uniform-error >=0.1.5
     , uniform-fileio
-    , uniform-strings >=0.1.3
-    , uniform-time >=0.1.0
+    , uniform-strings >=0.1.5
+    , uniform-time >=0.1.5
     , unix
     , zlib
   default-language: Haskell2010
